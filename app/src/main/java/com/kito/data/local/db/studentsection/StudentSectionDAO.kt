@@ -54,4 +54,3 @@ interface StudentSectionDAO {
         day: String
     ): List<StudentSectionEntity>
 }
-

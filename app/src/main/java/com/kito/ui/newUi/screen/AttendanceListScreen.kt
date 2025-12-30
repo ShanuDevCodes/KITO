@@ -1,5 +1,7 @@
 package com.kito.ui.newUi.screen
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -60,6 +62,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.glance.appwidget.updateAll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -71,6 +74,8 @@ import com.kito.ui.components.UIColors
 import com.kito.ui.components.state.SyncUiState
 import com.kito.ui.navigation.Destinations
 import com.kito.ui.newUi.viewmodel.AttendanceListScreenViewModel
+import com.kito.widget.TimeTableAppWidget
+import com.kito.widget.TimetableWidget
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
@@ -112,6 +117,14 @@ fun AttendanceListScreen(
         viewModel.syncEvents.collect { event ->
             when (event) {
                 is SyncUiState.Success -> {
+                    AppWidgetManager.getInstance(context)
+                        .getAppWidgetIds(
+                            ComponentName(context, TimeTableAppWidget::class.java)
+                        )
+                        .takeIf { it.isNotEmpty() }
+                        ?.let {
+                            TimetableWidget().updateAll(context)
+                        }
                     haptic.performHapticFeedback(HapticFeedbackType.Confirm)
                     Toast.makeText(
                         context,

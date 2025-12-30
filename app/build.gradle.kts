@@ -36,7 +36,7 @@ android {
             "PORTAL_BASE",
             "\"https://kiitportal.kiituniversity.net\"",
 
-        )
+            )
         buildConfigField(
             "String",
             "WD_PATH",
@@ -117,6 +117,7 @@ dependencies {
 
     //Dagger - Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.work.runtime.ktx)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 

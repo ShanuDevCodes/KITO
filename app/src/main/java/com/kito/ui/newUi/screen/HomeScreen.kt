@@ -1,5 +1,7 @@
 package com.kito.ui.newUi.screen
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -49,6 +51,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.glance.appwidget.updateAll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -65,6 +68,8 @@ import com.kito.ui.components.UpcomingEventCard
 import com.kito.ui.components.state.SyncUiState
 import com.kito.ui.navigation.Destinations
 import com.kito.ui.newUi.viewmodel.HomeViewmodel
+import com.kito.widget.TimeTableAppWidget
+import com.kito.widget.TimetableWidget
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.hazeEffect
@@ -120,6 +125,14 @@ fun HomeScreen(
         viewmodel.syncEvents.collect { event ->
             when (event) {
                 is SyncUiState.Success -> {
+                    AppWidgetManager.getInstance(context)
+                        .getAppWidgetIds(
+                            ComponentName(context, TimeTableAppWidget::class.java)
+                        )
+                        .takeIf { it.isNotEmpty() }
+                        ?.let {
+                            TimetableWidget().updateAll(context)
+                        }
                     haptic.performHapticFeedback(HapticFeedbackType.ToggleOff)
                     Toast.makeText(
                         context,

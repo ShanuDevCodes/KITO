@@ -14,14 +14,23 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.appwidget.lazy.itemsIndexed
+import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.layout.*
+import androidx.glance.color.ColorProvider
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
+import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.color.ColorProvider
 import com.kito.ScheduleActivity
 import com.kito.data.local.db.studentsection.StudentSectionEntity
 import dagger.hilt.android.EntryPointAccessors
@@ -63,6 +72,10 @@ class TimetableWidget : GlanceAppWidget() {
 //        val schedule = sampleSchedule
 
         provideContent {
+            Log.d(
+                "WidgetWorker",
+                "Widget content updated"
+            )
             TimetableWidgetContent(
                 rollNo = rollNo,
                 day = day,
@@ -76,24 +89,6 @@ class TimetableWidget : GlanceAppWidget() {
         day: String,
         schedule: List<StudentSectionEntity>
     ) {
-        val calendar = Calendar.getInstance()
-        val nowInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
-        val activeIndex = schedule.indexOfFirst { item ->
-            val start = timeToMinutes(item.startTime)
-            val end = timeToMinutes(item.endTime)
-            nowInMinutes in start until end
-        }
-        val hasActiveClass = activeIndex != -1
-        val upcomingIndex =
-            if (activeIndex != -1) {
-                activeIndex
-            } else {
-                schedule.indexOfFirst {
-                    timeToMinutes(it.startTime) > nowInMinutes
-                }
-            }
-
-        val isDayOver = upcomingIndex == -1
         val bgTop = Color(0xFF1A1423)
         val cardBg = Color(0xFF261E26)
         val textPrimaryK = Color(0xFFF3EFF3)
@@ -129,70 +124,45 @@ class TimetableWidget : GlanceAppWidget() {
 
                     when {
                         rollNo.isEmpty() -> {
-                            Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = GlanceModifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Text(
                                     text = "Please login in the app",
-                                    style = TextStyle(color = ColorProvider(day = textSecondaryK, night = textSecondaryK), fontSize = 14.sp)
+                                    style = TextStyle(
+                                        color = ColorProvider(day = textSecondaryK, night = textSecondaryK),
+                                        fontSize = 14.sp
+                                    )
                                 )
                             }
                         }
+
                         schedule.isEmpty() -> {
-                            Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = GlanceModifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Text(
-                                    text = if (day == "SUN") "Happy Sunday! 🏖️" else "No classes found",
-                                    style = TextStyle(color = ColorProvider(day = textSecondaryK, night = textSecondaryK), fontSize = 12.sp)
+                                    text = if (day == "SUN") "Happy Sunday! 🏖️" else "No classes today",
+                                    style = TextStyle(
+                                        color = ColorProvider(day = textSecondaryK, night = textSecondaryK),
+                                        fontSize = 12.sp
+                                    )
                                 )
                             }
                         }
-                        isDayOver -> {
-                            Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = "No more classes today",
-                                    style = TextStyle(color = ColorProvider(day = textSecondaryK, night = textSecondaryK), fontSize = 14.sp)
-                                )
-                            }
-                        }
+
                         else -> {
-                            val upcomingSchedule =
-                                if (hasActiveClass) {
-                                    schedule.subList(activeIndex, schedule.size)
-                                } else {
-                                    schedule.subList(upcomingIndex, schedule.size)
-                                }
-
                             LazyColumn(modifier = GlanceModifier.fillMaxWidth()) {
-                                itemsIndexed(upcomingSchedule) { index, item ->
-                                    Column(modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                                        if (index == 0) {
-                                            Text(
-                                                text = "CURRENT",
-                                                style = TextStyle(
-                                                    color = ColorProvider(day = accentOrange, night = accentOrange),
-                                                    fontSize = 10.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                ),
-                                                modifier = GlanceModifier.padding(start = 4.dp, bottom = 2.dp)
-                                            )
-                                        } else if (index == 1) {
-                                            Text(
-                                                text = "NEXT",
-                                                style = TextStyle(
-                                                    color = ColorProvider(day = textSecondaryK, night = textSecondaryK),
-                                                    fontSize = 10.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                ),
-                                                modifier = GlanceModifier.padding(start = 4.dp, bottom = 2.dp, top = 4.dp)
-                                            )
-                                        }
-
-                                        TimetableItem(
-                                            item = item,
-                                            cardBg = cardBg,
-                                            textPrimary = textPrimaryK,
-                                            textSecondary = textSecondaryK,
-                                            accent = if (index == 0) accentOrange else Color.Gray
-                                        )
-                                    }
+                                items(schedule) { item ->
+                                    TimetableItem(
+                                        item = item,
+                                        cardBg = cardBg,
+                                        textPrimary = textPrimaryK,
+                                        textSecondary = textSecondaryK,
+                                        accent = accentOrange
+                                    )
                                 }
                             }
                         }
@@ -212,59 +182,64 @@ class TimetableWidget : GlanceAppWidget() {
     ) {
         val startTime = formatTime(item.startTime)
         val endTime = formatTime(item.endTime)
-        Row(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .background(cardBg)
-                .cornerRadius(16.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = GlanceModifier.padding(bottom = 8.dp)
         ) {
-            Column(modifier = GlanceModifier.width(60.dp)) {
-                Text(
-                    text = startTime,
-                    style = TextStyle(
-                        color = ColorProvider(day = textPrimary, night = textPrimary),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-                Text(
-                    text = endTime,
-                    style = TextStyle(
-                        color = ColorProvider(day = textSecondary, night = textSecondary),
-                        fontSize = 10.sp
-                    )
-                )
-            }
-
-            Box(
+            Row(
                 modifier = GlanceModifier
-                    .width(2.dp)
-                    .height(30.dp)
-                    .background(accent)
-            ) {}
-
-            Spacer(modifier = GlanceModifier.width(8.dp))
-
-            Column(modifier = GlanceModifier.defaultWeight()) {
-                Text(
-                    text = item.subject,
-                    style = TextStyle(
-                        color = ColorProvider(day = textPrimary, night = textPrimary),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    ),
-                    maxLines = 1
-                )
-                if (item.room != null) {
+                    .fillMaxWidth()
+                    .clickable(actionStartActivity<ScheduleActivity>())
+                    .background(cardBg)
+                    .cornerRadius(16.dp)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = GlanceModifier.width(60.dp)) {
                     Text(
-                        text = "Room: ${item.room}",
+                        text = startTime,
                         style = TextStyle(
-                            color = ColorProvider(day = textSecondary, night = textSecondary),
-                            fontSize = 11.sp
+                            color = ColorProvider(day = textPrimary, night = textPrimary),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     )
+                    Text(
+                        text = endTime,
+                        style = TextStyle(
+                            color = ColorProvider(day = textSecondary, night = textSecondary),
+                            fontSize = 10.sp
+                        )
+                    )
+                }
+
+                Box(
+                    modifier = GlanceModifier
+                        .width(2.dp)
+                        .height(30.dp)
+                        .background(accent)
+                ) {}
+
+                Spacer(modifier = GlanceModifier.width(8.dp))
+
+                Column(modifier = GlanceModifier.defaultWeight()) {
+                    Text(
+                        text = item.subject,
+                        style = TextStyle(
+                            color = ColorProvider(day = textPrimary, night = textPrimary),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        maxLines = 1
+                    )
+                    if (item.room != null) {
+                        Text(
+                            text = "Room: ${item.room}",
+                            style = TextStyle(
+                                color = ColorProvider(day = textSecondary, night = textSecondary),
+                                fontSize = 11.sp
+                            )
+                        )
+                    }
                 }
             }
         }

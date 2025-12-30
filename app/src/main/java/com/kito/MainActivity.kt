@@ -64,7 +64,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appUpdateManager = AppUpdateManagerFactory.create(this)
-
         setContent {
             var keepOnScreenCondition by remember { mutableStateOf(true) }
 
@@ -72,7 +71,6 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 val onboardingDone = prefs.onBoardingFlow.first()
                 val isUserSetupDone = prefs.userSetupDoneFlow.first()
-
                 when {
                     !onboardingDone -> {
                         startActivity(
