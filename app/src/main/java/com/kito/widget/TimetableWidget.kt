@@ -1,86 +1,51 @@
-package com.kito
+package com.kito.widget
 
 import android.content.Context
-import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.itemsIndexed
 import androidx.glance.appwidget.provideContent
-import androidx.glance.appwidget.updateAll
 import androidx.glance.background
-import androidx.glance.color.ColorProvider
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
-import androidx.glance.layout.Column
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
-import androidx.glance.layout.padding
-import androidx.glance.layout.width
+import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.room.Room
-import com.kito.data.local.db.AppDB
+import androidx.glance.color.ColorProvider
+import com.kito.ScheduleActivity
 import com.kito.data.local.db.studentsection.StudentSectionEntity
-import com.kito.di.dataStore
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-
-class NewAppWidget : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget = TimetableWidget()
-
-    override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
-        // Listen for system time changes to update the clock every minute
-        if (intent.action == Intent.ACTION_TIME_TICK || 
-            intent.action == Intent.ACTION_TIME_CHANGED || 
-            intent.action == Intent.ACTION_TIMEZONE_CHANGED ||
-            intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            runBlocking {
-                TimetableWidget().updateAll(context)
-            }
-        }
-    }
-}
 
 class TimetableWidget : GlanceAppWidget() {
 
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val db = Room.databaseBuilder(context, AppDB::class.java, "kito_db").build()
-        val studentSectionDao = db.studentSectionDao()
+    override suspend fun provideGlance(
+        context: Context,
+        id: GlanceId
+    ) {
+        Log.d("Widget", "provideGlance called")
+        val entryPoint = EntryPointAccessors.fromApplication(
+            context,
+            WidgetEntryPoint::class.java
+        )
 
-        val rollNo = try {
-            context.dataStore.data.map { prefs ->
-                prefs[stringPreferencesKey("User_Password")] ?: ""
-            }.first()
-        } catch (e: Exception) {
-            ""
-        }
+        val prefs = entryPoint.prefsRepository()
+        val repo = entryPoint.studentSectionRepository()
 
-        // Get current day of the week
-        val dayOfWeek = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
+        val rollNo = prefs.userRollFlow.first()
+
+        val day = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
             Calendar.MONDAY -> "MON"
             Calendar.TUESDAY -> "TUE"
             Calendar.WEDNESDAY -> "WED"
@@ -90,37 +55,50 @@ class TimetableWidget : GlanceAppWidget() {
             else -> "SUN"
         }
 
+        val schedule = if (rollNo.isNotEmpty()) {
+            repo.getScheduleForStudentBlocking(rollNo, day)
+        } else {
+            emptyList()
+        }
+//        val schedule = sampleSchedule
+
         provideContent {
-            val schedule by studentSectionDao.getScheduleForStudent(rollNo, dayOfWeek).collectAsState(initial = emptyList())
-            TimetableWidgetContent(schedule, dayOfWeek, rollNo)
+            TimetableWidgetContent(
+                rollNo = rollNo,
+                day = day,
+                schedule = schedule
+            )
         }
     }
-
     @Composable
-    private fun TimetableWidgetContent(schedule: List<StudentSectionEntity>, day: String, rollNo: String) {
-        val bgTop = Color(0xFF1A1423)
-        val cardBg = Color(0xFF261E26)
-        val textPrimary = Color(0xFFF3EFF3)
-        val textSecondary = Color(0xFFCECAD0)
-        val accentOrange = Color(0xFFEA850A)
-
-        // Restored real time calculation
+    private fun TimetableWidgetContent(
+        rollNo: String,
+        day: String,
+        schedule: List<StudentSectionEntity>
+    ) {
         val calendar = Calendar.getInstance()
         val nowInMinutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
-        
-        // SimpleDateFormat can sometimes be slightly off due to caching if not careful, 
-        // using calendar for maximum precision with the system clock
-        val currentTime = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE))
-
-        // Filter and find current/next classes
-        // Rule: 15 minutes before current class ends, move to next.
         val activeIndex = schedule.indexOfFirst { item ->
-            val endTimeMinutes = timeToMinutes(item.endTime)
-            nowInMinutes < (endTimeMinutes - 15)
+            val start = timeToMinutes(item.startTime)
+            val end = timeToMinutes(item.endTime)
+            nowInMinutes in start until end
         }
+        val hasActiveClass = activeIndex != -1
+        val upcomingIndex =
+            if (activeIndex != -1) {
+                activeIndex
+            } else {
+                schedule.indexOfFirst {
+                    timeToMinutes(it.startTime) > nowInMinutes
+                }
+            }
 
-        val isDayOver = activeIndex == -1
-
+        val isDayOver = upcomingIndex == -1
+        val bgTop = Color(0xFF1A1423)
+        val cardBg = Color(0xFF261E26)
+        val textPrimaryK = Color(0xFFF3EFF3)
+        val textSecondaryK = Color(0xFFCECAD0)
+        val accentOrange = Color(0xFFEA850A)
         GlanceTheme {
             Box(
                 modifier = GlanceModifier
@@ -139,23 +117,12 @@ class TimetableWidget : GlanceAppWidget() {
                             Text(
                                 text = day,
                                 style = TextStyle(
-                                    color = ColorProvider(day = accentOrange, night = accentOrange), 
-                                    fontSize = 12.sp, 
+                                    color = ColorProvider(day = accentOrange, night = accentOrange),
+                                    fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                             )
                         }
-                        
-                        // Digital Clock
-                        Text(
-                            text = currentTime,
-                            style = TextStyle(
-                                color = ColorProvider(day = textSecondary, night = textSecondary),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold
-                            ),
-                            modifier = GlanceModifier.padding(end = 4.dp)
-                        )
                     }
 
                     Spacer(modifier = GlanceModifier.height(12.dp))
@@ -165,7 +132,7 @@ class TimetableWidget : GlanceAppWidget() {
                             Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Text(
                                     text = "Please login in the app",
-                                    style = TextStyle(color = ColorProvider(day = textSecondary, night = textSecondary), fontSize = 14.sp)
+                                    style = TextStyle(color = ColorProvider(day = textSecondaryK, night = textSecondaryK), fontSize = 14.sp)
                                 )
                             }
                         }
@@ -173,7 +140,7 @@ class TimetableWidget : GlanceAppWidget() {
                             Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Text(
                                     text = if (day == "SUN") "Happy Sunday! 🏖️" else "No classes found",
-                                    style = TextStyle(color = ColorProvider(day = textSecondary, night = textSecondary), fontSize = 12.sp)
+                                    style = TextStyle(color = ColorProvider(day = textSecondaryK, night = textSecondaryK), fontSize = 12.sp)
                                 )
                             }
                         }
@@ -181,13 +148,18 @@ class TimetableWidget : GlanceAppWidget() {
                             Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                 Text(
                                     text = "No more classes today",
-                                    style = TextStyle(color = ColorProvider(day = textSecondary, night = textSecondary), fontSize = 14.sp)
+                                    style = TextStyle(color = ColorProvider(day = textSecondaryK, night = textSecondaryK), fontSize = 14.sp)
                                 )
                             }
                         }
                         else -> {
-                            val upcomingSchedule = schedule.subList(activeIndex, schedule.size)
-                            
+                            val upcomingSchedule =
+                                if (hasActiveClass) {
+                                    schedule.subList(activeIndex, schedule.size)
+                                } else {
+                                    schedule.subList(upcomingIndex, schedule.size)
+                                }
+
                             LazyColumn(modifier = GlanceModifier.fillMaxWidth()) {
                                 itemsIndexed(upcomingSchedule) { index, item ->
                                     Column(modifier = GlanceModifier.fillMaxWidth().padding(bottom = 8.dp)) {
@@ -195,8 +167,8 @@ class TimetableWidget : GlanceAppWidget() {
                                             Text(
                                                 text = "CURRENT",
                                                 style = TextStyle(
-                                                    color = ColorProvider(day = accentOrange, night = accentOrange), 
-                                                    fontSize = 10.sp, 
+                                                    color = ColorProvider(day = accentOrange, night = accentOrange),
+                                                    fontSize = 10.sp,
                                                     fontWeight = FontWeight.Bold
                                                 ),
                                                 modifier = GlanceModifier.padding(start = 4.dp, bottom = 2.dp)
@@ -205,19 +177,19 @@ class TimetableWidget : GlanceAppWidget() {
                                             Text(
                                                 text = "NEXT",
                                                 style = TextStyle(
-                                                    color = ColorProvider(day = textSecondary, night = textSecondary), 
-                                                    fontSize = 10.sp, 
+                                                    color = ColorProvider(day = textSecondaryK, night = textSecondaryK),
+                                                    fontSize = 10.sp,
                                                     fontWeight = FontWeight.Bold
                                                 ),
                                                 modifier = GlanceModifier.padding(start = 4.dp, bottom = 2.dp, top = 4.dp)
                                             )
                                         }
-                                        
+
                                         TimetableItem(
                                             item = item,
                                             cardBg = cardBg,
-                                            textPrimary = textPrimary,
-                                            textSecondary = textSecondary,
+                                            textPrimary = textPrimaryK,
+                                            textSecondary = textSecondaryK,
                                             accent = if (index == 0) accentOrange else Color.Gray
                                         )
                                     }
@@ -252,15 +224,15 @@ class TimetableWidget : GlanceAppWidget() {
                 Text(
                     text = startTime,
                     style = TextStyle(
-                        color = ColorProvider(day = textPrimary, night = textPrimary), 
-                        fontSize = 12.sp, 
+                        color = ColorProvider(day = textPrimary, night = textPrimary),
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
                 Text(
                     text = endTime,
                     style = TextStyle(
-                        color = ColorProvider(day = textSecondary, night = textSecondary), 
+                        color = ColorProvider(day = textSecondary, night = textSecondary),
                         fontSize = 10.sp
                     )
                 )
@@ -289,7 +261,7 @@ class TimetableWidget : GlanceAppWidget() {
                     Text(
                         text = "Room: ${item.room}",
                         style = TextStyle(
-                            color = ColorProvider(day = textSecondary, night = textSecondary), 
+                            color = ColorProvider(day = textSecondary, night = textSecondary),
                             fontSize = 11.sp
                         )
                     )
