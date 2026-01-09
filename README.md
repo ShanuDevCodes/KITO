@@ -1,41 +1,65 @@
-# Kito - KIIT Attendance Checker
+# Kito – KIIT Attendance Checker
 
-A Kotlin-based Android application that securely fetches attendance data from the KIIT University SAP Portal. This app is designed to provide students with easy access to their attendance records without storing any sensitive information.
+Kito is a Kotlin-based Android application that helps KIIT students quickly view their attendance information in a simple, distraction-free interface.
 
-The app is Krazzy.
+The app is built with a strong focus on **privacy, transparency, and user trust**, ensuring that users always know what the app does — and just as importantly, what it does **not** do.
+
+📲 **Available on Google Play**  
+👉 https://play.google.com/store/apps/details?id=com.kito
+
+---
+
 
 ## 🚀 Features
 
-- **Secure Login**: Enter your KIIT credentials to access attendance data
-- **Real-time Fetching**: Get the latest attendance information directly from SAP Portal
-- **Privacy Focused**: No credentials or personal data are stored
-- **User-friendly Interface**: Clean UI showing subjects and attendance percentages
+### Secure Sign-In
+Access your attendance using your own credentials, entered only when needed.
 
-## 🔒 Security & Privacy
+### Live Attendance Data
+Fetches up-to-date attendance details whenever you check.
 
-- **Zero Data Storage**: No usernames, passwords, or personal data are ever stored
-- **Secure Wiping**: Credentials are immediately wiped from memory after use
-- **Encrypted Communication**: All network requests use HTTPS with proper headers
-- **Session Management**: Proper login/logout with session cleanup
+### Privacy-First Design
+No credentials, personal data, or attendance records are stored.
 
-## 🏗 Architecture
+### Clean & Simple UI
+Easily view subjects and attendance percentages at a glance.
 
-The application separates sensitive SAP Portal interaction logic from the public interface:
+---
 
-- **Public Code**: Core app structure, UI, and data models
-- **Sensitive Code**: SAP Portal specific endpoints, parameters, and parsing logic (kept locally, not in repo)
+## 🔒 Privacy & Transparency
+
+Kito is designed around a single principle: **your data stays with you**.
+
+- **No Data Storage**  
+  User credentials and personal information are never saved locally or remotely.
+
+- **Ephemeral Usage**  
+  Credentials exist only in memory for the duration of the request and are immediately cleared afterward.
+
+- **Secure Communication**  
+  All network communication uses encrypted connections.
+
+- **No Analytics / Tracking**  
+  No trackers, ads, or hidden data collection of any kind.
+
+If an app ever asks for your credentials, you deserve to know **exactly why** and **how they’re handled**.  
+Do **not** share your credentials with software or individuals who are not upfront about their behavior and intentions.
+
+---
 
 ## 🛠 Tech Stack
 
 - **Language**: Kotlin
-- **Networking**: OkHttp3 for HTTP requests
-- **HTML Parsing**: JSoup for parsing SAP Portal responses
-- **Coroutines**: For asynchronous operations
-- **SAP Portal Integration**: Direct communication with KIIT's SAP infrastructure
+- **Networking**: OkHttp
+- **HTML Parsing**: JSoup
+- **Asynchronous Operations**: Kotlin Coroutines
+- **Platform**: Android
 
-## ⚙️ Build Setup
+---
 
-This project uses Gradle for dependency management and building:
+## ⚙️ Build Instructions
+
+This project uses Gradle for building:
 
 ```bash
 # Build the project
@@ -43,36 +67,32 @@ This project uses Gradle for dependency management and building:
 
 # Assemble debug APK
 ./gradlew assembleDebug
-```
-
-## 📁 Project Structure
 
 ```
-app/
-├── src/main/java/com/kito/
-│   ├── MainActivity.kt          # Main UI
-│   ├── SapPortalClient.kt       # Public interface (no sensitive details)
-│   └── sap/
-│       ├── sensitive/           # PRIVATE - SAP Portal logic (in .gitignore)
-│       └── SapPortalClient.kt   # Public interface
-├── src/main/res/                # Resources
-└── build.gradle.kts             # Build configuration
-```
 
-## 🚫 Important Notes
-
-- The `app/src/main/java/com/kito/sap/sensitive/` directory contains the actual SAP Portal interaction code and is excluded from the repository via `.gitignore`
-- This ensures that the reverse-engineered SAP Portal details are not exposed publicly
-- The application works by combining the public interface with the local sensitive code
 
 ## 🤝 Contributing
 
-Feel free to submit issues or pull requests. All contributions are welcome!
+Contributions are welcome.
+
+If you have ideas, improvements, or bug reports, feel free to open an issue or submit a pull request.
+Please ensure that any contributions respect user privacy and maintain the transparency principles of the project.
+
+---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
+See the `LICENSE` file for more details.
 
-## ⚠️ Disclaimer
+---
 
-This application is a third-party integration and is not officially affiliated with KIIT University. Use at your own discretion and ensure compliance with the university's terms of service.
+## ⚠️ User Notice
+
+This project is independently developed for educational and personal-use purposes.
+
+Your credentials are **used only to fetch your attendance and are never stored, logged, or shared**.
+Kito is built with transparency at its core — the app clearly communicates what it does, how your data is handled, and what it does **not** do.
+
+That said, always be cautious with your credentials online.
+Only trust applications that are open and explicit about their behavior, data usage, and limitations — **transparency is non-negotiable**.
