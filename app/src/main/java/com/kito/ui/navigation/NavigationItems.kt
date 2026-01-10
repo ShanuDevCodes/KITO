@@ -3,6 +3,7 @@ package com.kito.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,6 +51,11 @@ sealed class BottomBarTab(
         icon = Icons.Filled.CheckCircle,
         color = Color(0xFFFFA574)
     )
+    data object Faculty : BottomBarTab(
+        title = "Faculty",
+        Icons.Default.School,
+        Color(0xFFFFA574)
+    )
     data object Settings : BottomBarTab(
         title = "Settings",
         icon = Icons.Filled.Settings,
@@ -60,6 +66,7 @@ sealed class BottomBarTab(
 val tabs = listOf(
     BottomBarTab.Home,
     BottomBarTab.Attendance,
+    BottomBarTab.Faculty,
     BottomBarTab.Settings
 )
 

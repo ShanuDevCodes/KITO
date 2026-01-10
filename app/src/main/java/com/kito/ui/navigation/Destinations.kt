@@ -9,5 +9,7 @@ sealed class Destinations {
     @Serializable
     object Attendance: Destinations()
     @Serializable
+    object Faculty: Destinations()
+    @Serializable
     object Profile: Destinations()
 }

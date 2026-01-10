@@ -279,67 +279,9 @@ fun HomeScreen(
                 }
 
                 item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Overall Attendance",
-                            color = uiColors.textPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                navController.navigate(Destinations.Attendance) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                                contentDescription = "Notifications",
-                                tint = uiColors.textPrimary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-
-                item {
                     Spacer(Modifier.height(8.dp))
                 }
-
-                // Horizontal Cards
-                item {
-                    OverallAttendanceCard(
-                        colors = uiColors,
-                        sapLoggedIn = sapLoggedIn,
-                        percentage = averageAttendancePercentage,
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            isLoginDialogOpen = true
-                        },
-                        onNavigate = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            navController.navigate(Destinations.Attendance) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-                if (false) {
+                if (true) {
                     item {
                         Spacer(Modifier.height(8.dp))
                     }
@@ -373,9 +315,7 @@ fun HomeScreen(
                         AnimatedVisibility(
                             visible = true,
                             enter = fadeIn() + expandVertically()
-                        ) {
-                            Text("Updating")
-                        }
+                        ) {}
                     }
 
                     item {
@@ -385,6 +325,70 @@ fun HomeScreen(
                     item {
                         UpcomingEventCard()
                     }
+                }
+
+                item {
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Attendance",
+                            color = uiColors.textPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                navController.navigate(Destinations.Attendance) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                                contentDescription = "Notifications",
+                                tint = uiColors.textPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+                item {
+                    Spacer(Modifier.height(8.dp))
+                }
+                // Horizontal Cards
+                item {
+                    OverallAttendanceCard(
+                        colors = uiColors,
+                        sapLoggedIn = sapLoggedIn,
+                        percentage = averageAttendancePercentage,
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            isLoginDialogOpen = true
+                        },
+                        onNavigate = {
+                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                            navController.navigate(Destinations.Attendance) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
                 }
 
                 item {
