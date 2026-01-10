@@ -2,7 +2,9 @@
 
 Kito is a Kotlin-based Android application that helps KIIT students quickly view their attendance information in a simple, distraction-free interface.
 
-The app is built with a strong focus on **privacy, transparency, and user trust**, ensuring that users always know what the app does — and just as importantly, what it does **not** do.
+The app is built with a strong focus on **privacy, transparency, and user trust**, ensuring that users always know what the app does — and just as importantly, what it does **not** do. 
+
+The app has no backend, no external servers to communicate with. It is just a frontend which sends requests and receives response from SAP, that's it.
 
 📲 **Available on Google Play**  
 👉 https://play.google.com/store/apps/details?id=com.kito
