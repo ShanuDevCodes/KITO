@@ -1,0 +1,78 @@
+package com.kito.ui.components
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.kito.data.remote.model.FacultyModel
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun FacultyCardContent(faculty: FacultyModel) {
+    val uiColors = UIColors()
+
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+
+        Text(
+            text = "${faculty.teacher}",
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            color = uiColors.textPrimary,
+            style = MaterialTheme.typography.titleMediumEmphasized
+        )
+
+//        Text(
+//            text = "Subject : ${faculty.subject}",
+//            fontFamily = FontFamily.Monospace,
+//            color = uiColors.textSecondary,
+//            style = MaterialTheme.typography.bodySmall
+//        )
+//
+//        Text(
+//            text = "Batch: ${faculty.batch}",
+//            fontFamily = FontFamily.Monospace,
+//            color = uiColors.textSecondary,
+//            style = MaterialTheme.typography.bodySmall
+//        )
+//
+//        Text(
+//            text = "Day: ${faculty.day}",
+//            fontFamily = FontFamily.Monospace,
+//            color = uiColors.textSecondary,
+//            style = MaterialTheme.typography.bodySmall
+//        )
+//
+//        Text(
+//            text = "Slot: ${faculty.slot}",
+//            fontFamily = FontFamily.Monospace,
+//            color = uiColors.textSecondary,
+//            style = MaterialTheme.typography.bodySmall
+//        )
+//
+//        Text(
+//            text = "Classroom: ${faculty.class_room}",
+//            fontFamily = FontFamily.Monospace,
+//            color = uiColors.textSecondary,
+//            style = MaterialTheme.typography.bodySmall
+//        )
+
+        Text(
+            text = "Faculty Room: ${faculty.faculty_room}",
+            fontFamily = FontFamily.Monospace,
+            color = uiColors.textSecondary,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Text(
+            text = "Email: ${faculty.email_id}",
+            fontFamily = FontFamily.Monospace,
+            color = uiColors.textSecondary,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}

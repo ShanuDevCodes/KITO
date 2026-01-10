@@ -50,6 +50,7 @@ import com.kito.ui.navigation.BottomBarTabs
 import com.kito.ui.navigation.Destinations
 import com.kito.ui.navigation.tabs
 import com.kito.ui.newUi.screen.AttendanceListScreen
+import com.kito.ui.newUi.screen.FacultyScreen
 import com.kito.ui.newUi.screen.HomeScreen
 import com.kito.ui.newUi.screen.SettingsScreen
 import com.kito.ui.newUi.viewmodel.AppViewModel
@@ -85,7 +86,8 @@ fun MainUI(
             selectedTabIndex = when {
                 dest.hasRoute<Destinations.Home>() -> 0
                 dest.hasRoute<Destinations.Attendance>() -> 1
-                dest.hasRoute<Destinations.Profile>() -> 2
+                dest.hasRoute<Destinations.Faculty>() -> 2
+                dest.hasRoute<Destinations.Profile>() -> 3
                 else -> 0
             }
         }
@@ -150,7 +152,6 @@ fun MainUI(
                     val tabWidth = size.width / tabs.size
                     val centerOffset = tabWidth * animatedSelectedTabIndex + tabWidth / 2
 
-                    // 1. Reduced Background Glow
                     drawCircle(
                         brush = Brush.radialGradient(
                             colors = listOf(
@@ -171,7 +172,6 @@ fun MainUI(
                     measure.setPath(path, false)
                     val length = measure.length
 
-                    // 2. Focused Bottom Edge Light
                     drawPath(
                         path = path,
                         brush = Brush.horizontalGradient(
@@ -196,6 +196,7 @@ fun MainUI(
                         val destination = when (tab) {
                             is BottomBarTab.Home -> Destinations.Home
                             is BottomBarTab.Attendance -> Destinations.Attendance
+                            is BottomBarTab.Faculty -> Destinations.Faculty
                             is BottomBarTab.Settings -> Destinations.Profile
                         }
                         navController.navigate(destination) {
@@ -224,6 +225,11 @@ fun MainUI(
             }
             composable<Destinations.Attendance> {
                 AttendanceListScreen(
+                    navController = navController
+                )
+            }
+            composable<Destinations.Faculty> {
+                FacultyScreen(
                     navController = navController
                 )
             }
