@@ -14,13 +14,17 @@ import com.kito.data.remote.model.TeacherModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun FacultyCardContent(faculty: TeacherModel) {
+fun FacultyCardContent(
+    facultyName: String,
+    facultyOffice: String,
+    facultyEmail: String
+) {
     val uiColors = UIColors()
 
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
 
         Text(
-            text = "${faculty.name}",
+            text = facultyName,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
             color = uiColors.textPrimary,
@@ -63,14 +67,14 @@ fun FacultyCardContent(faculty: TeacherModel) {
 //        )
 
         Text(
-            text = "Faculty Room: ${faculty.office_room}",
+            text = "Faculty Room: $facultyOffice",
             fontFamily = FontFamily.Monospace,
             color = uiColors.textSecondary,
             style = MaterialTheme.typography.bodySmall
         )
 
         Text(
-            text = "Email: ${faculty.email}",
+            text = "Email: $facultyEmail",
             fontFamily = FontFamily.Monospace,
             color = uiColors.textSecondary,
             style = MaterialTheme.typography.bodySmall

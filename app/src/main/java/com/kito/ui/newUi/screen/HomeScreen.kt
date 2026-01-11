@@ -141,7 +141,8 @@ fun HomeScreen(
                 DayOfWeek.WEDNESDAY -> "WED"
                 DayOfWeek.THURSDAY -> "THU"
                 DayOfWeek.FRIDAY -> "FRI"
-                else -> "MON"
+                DayOfWeek.SATURDAY -> "SAT"
+                DayOfWeek.SUNDAY -> "SUN"
             }
 
             viewmodel.updateDay(today)
