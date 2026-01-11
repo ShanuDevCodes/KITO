@@ -174,8 +174,6 @@ fun MainUI(
                     }
                     val measure = PathMeasure()
                     measure.setPath(path, false)
-                    val length = measure.length
-
                     drawPath(
                         path = path,
                         brush = Brush.horizontalGradient(
