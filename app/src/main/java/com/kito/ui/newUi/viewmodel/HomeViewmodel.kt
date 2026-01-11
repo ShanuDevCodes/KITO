@@ -132,6 +132,26 @@ class HomeViewmodel @Inject constructor(
                 started = SharingStarted.WhileSubscribed(5_000),
                 initialValue = 0.0
             )
+    val highestAttendancePercentage: StateFlow<Double> =
+        attendance
+            .map { list ->
+                list.maxOfOrNull { it.percentage } ?: 0.0
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = 0.0
+            )
+    val lowestAttendancePercentage: StateFlow<Double> =
+        attendance
+            .map { list ->
+                list.minOfOrNull { it.percentage } ?: 0.0
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = 0.0
+            )
     fun login(
         password: String
     ){

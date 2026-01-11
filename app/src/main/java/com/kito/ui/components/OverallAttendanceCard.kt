@@ -54,14 +54,34 @@ import dev.chrisbanes.haze.rememberHazeState
 fun OverallAttendanceCard(
     colors: UIColors,
     sapLoggedIn: Boolean,
-    percentage: Double,
+    percentageOverall: Double,
+    percentageHighest: Double,
+    percentageLowest: Double,
     onClick:() -> Unit,
-    onNavigate:()-> Unit
+    onNavigate:()-> Unit,
 ) {
-    var targetProgress by remember { mutableFloatStateOf(0f) }
+    var targetProgressOverall by remember { mutableFloatStateOf(0f) }
+    var targetProgressHighest by remember { mutableFloatStateOf(0f) }
+    var targetProgressLowest by remember { mutableFloatStateOf(0f) }
 
-    val progress by animateFloatAsState(
-        targetValue = targetProgress,
+    val progressOverall by animateFloatAsState(
+        targetValue = targetProgressOverall,
+        animationSpec = tween(
+            durationMillis = 1000,
+            easing = FastOutSlowInEasing
+        ),
+        label = "attendance"
+    )
+    val progressHighest by animateFloatAsState(
+        targetValue = targetProgressHighest,
+        animationSpec = tween(
+            durationMillis = 1000,
+            easing = FastOutSlowInEasing
+        ),
+        label = "attendance"
+    )
+    val progressLowest by animateFloatAsState(
+        targetValue = targetProgressLowest,
         animationSpec = tween(
             durationMillis = 1000,
             easing = FastOutSlowInEasing
@@ -71,10 +91,30 @@ fun OverallAttendanceCard(
 
     val hazeEffect = rememberHazeState()
 
-    LaunchedEffect(percentage, sapLoggedIn) {
-        targetProgress =
+    LaunchedEffect(percentageOverall, sapLoggedIn) {
+        targetProgressOverall =
             if (sapLoggedIn) {
-                (percentage / 100.0)
+                (percentageOverall / 100.0)
+                    .toFloat()
+                    .coerceIn(0f, 1f)
+            }else{
+                0.8f
+            }
+    }
+    LaunchedEffect(percentageHighest, sapLoggedIn) {
+        targetProgressHighest =
+            if (sapLoggedIn) {
+                (percentageHighest / 100.0)
+                    .toFloat()
+                    .coerceIn(0f, 1f)
+            }else{
+                0.8f
+            }
+    }
+    LaunchedEffect(percentageLowest, sapLoggedIn) {
+        targetProgressLowest =
+            if (sapLoggedIn) {
+                (percentageLowest / 100.0)
                     .toFloat()
                     .coerceIn(0f, 1f)
             }else{
@@ -118,6 +158,9 @@ fun OverallAttendanceCard(
                         modifier = Modifier
                             .weight(1f)
                     ){
+                        Spacer(
+                            modifier = Modifier.width(4.dp)
+                        )
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -128,13 +171,14 @@ fun OverallAttendanceCard(
                             Spacer(modifier = Modifier.height(20.dp))
                             Box(
                                 contentAlignment = Alignment.Center,
+                                modifier = Modifier.aspectRatio(1f)
                             ) {
                                 CircularWavyProgressIndicator(
                                     progress = {
-                                        1f
+                                        progressHighest
                                     },
                                     modifier = Modifier
-                                        .size(100.dp),
+                                        .fillMaxSize(),
                                     waveSpeed = 30.dp,
                                     wavelength = 45.dp,
                                     color = colors.accentOrangeStart,
@@ -144,7 +188,7 @@ fun OverallAttendanceCard(
                                     }
                                 )
                                 Text(
-                                    text = "100%",
+                                    text = "${"%.1f".format(progressHighest * 100)}%",
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.titleLargeEmphasized
                                 )
@@ -156,7 +200,9 @@ fun OverallAttendanceCard(
                                 style = MaterialTheme.typography.labelLargeEmphasized
                             )
                         }
-
+                        Spacer(
+                            modifier = Modifier.width(4.dp)
+                        )
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -167,13 +213,14 @@ fun OverallAttendanceCard(
                             Spacer(modifier = Modifier.height(20.dp))
                             Box(
                                 contentAlignment = Alignment.Center,
+                                modifier = Modifier.aspectRatio(1f)
                             ) {
                                 CircularWavyProgressIndicator(
                                     progress = {
-                                        progress
+                                        progressOverall
                                     },
                                     modifier = Modifier
-                                        .size(100.dp),
+                                        .fillMaxSize(),
                                     waveSpeed = 30.dp,
                                     wavelength = 45.dp,
                                     color = colors.accentOrangeStart,
@@ -183,7 +230,7 @@ fun OverallAttendanceCard(
                                     }
                                 )
                                 Text(
-                                    text = "${"%.1f".format(progress * 100)}%",
+                                    text = "${"%.1f".format(progressOverall * 100)}%",
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.titleLargeEmphasized
                                 )
@@ -195,7 +242,9 @@ fun OverallAttendanceCard(
                                 style = MaterialTheme.typography.labelLargeEmphasized
                             )
                         }
-
+                        Spacer(
+                            modifier = Modifier.width(4.dp)
+                        )
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -206,13 +255,14 @@ fun OverallAttendanceCard(
                             Spacer(modifier = Modifier.height(20.dp))
                             Box(
                                 contentAlignment = Alignment.Center,
+                                modifier = Modifier.aspectRatio(1f)
                             ) {
                                 CircularWavyProgressIndicator(
                                     progress = {
-                                        0.63f
+                                        progressLowest
                                     },
                                     modifier = Modifier
-                                        .size(100.dp),
+                                        .fillMaxSize(),
                                     waveSpeed = 30.dp,
                                     wavelength = 45.dp,
                                     color = colors.accentOrangeStart,
@@ -222,7 +272,7 @@ fun OverallAttendanceCard(
                                     }
                                 )
                                 Text(
-                                    text = "63%",
+                                    text = "${"%.1f".format(progressLowest * 100)}%",
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.titleLargeEmphasized
                                 )
@@ -234,6 +284,9 @@ fun OverallAttendanceCard(
                                 style = MaterialTheme.typography.labelLargeEmphasized
                             )
                         }
+                        Spacer(
+                            modifier = Modifier.width(4.dp)
+                        )
                     }
 //                    Row(
 //                        modifier = Modifier
@@ -274,7 +327,7 @@ fun OverallAttendanceCard(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .aspectRatio(
-                        ratio = 1f
+                        ratio = 1.7f
                     )
                     .fillMaxSize()
                     .clip(
