@@ -11,12 +11,18 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,9 +30,14 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -44,8 +55,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -53,6 +67,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.glance.appwidget.updateAll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -83,6 +98,7 @@ import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
+import kotlin.math.absoluteValue
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalHazeApi::class,
@@ -98,6 +114,8 @@ fun HomeScreen(
     val name by viewmodel.name.collectAsState()
     val sapLoggedIn by viewmodel.sapLoggedIn.collectAsState()
     val averageAttendancePercentage by viewmodel.averageAttendancePercentage.collectAsState()
+    val highestAttendancePercentage by viewmodel.highestAttendancePercentage.collectAsState()
+    val lowestAttendancePercentage by viewmodel.lowestAttendancePercentage.collectAsState()
     val schedule by viewmodel.schedule.collectAsState()
     val syncState by viewmodel.syncState.collectAsState()
     val context = LocalContext.current
@@ -173,8 +191,8 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp)
                 .hazeSource(hazeState)
+                .padding(horizontal = 12.dp)
         ) {
             LazyColumn() {
                 item {
@@ -207,7 +225,8 @@ fun HomeScreen(
 
                 item {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
                     ) {
                         Text(
                             text = "Today's Schedule",
@@ -215,7 +234,8 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Monospace,
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
                         )
                         IconButton(
                             onClick = {
@@ -263,77 +283,58 @@ fun HomeScreen(
 
                 // Schedule Section
                 item {
-                    ScheduleCard(
-                        colors = uiColors,
-                        schedule = schedule,
-                        onCLick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            val intent = Intent(context, ScheduleActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                    )
-                }
-
-                item {
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                item {
-                    Spacer(Modifier.height(8.dp))
-                }
-                if (true) {
-                    item {
-                        Spacer(Modifier.height(8.dp))
-                    }
-
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Upcoming KIIT Events",
-                                color = uiColors.textPrimary,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(
-                                onClick = {},
-                                modifier = Modifier.size(28.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                                    contentDescription = "Notifications",
-                                    tint = uiColors.textPrimary,
-                                    modifier = Modifier.size(16.dp)
-                                )
+                        ScheduleCard(
+                            colors = uiColors,
+                            schedule = schedule,
+                            onCLick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                val intent = Intent(context, ScheduleActivity::class.java)
+                                context.startActivity(intent)
                             }
-                        }
-                    }
-                    item {
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + expandVertically()
-                        ) {}
-                    }
-
-                    item {
-                        Spacer(Modifier.height(8.dp))
-                    }
-
-                    item {
-                        UpcomingEventCard()
-                    }
+                        )
                 }
-
                 item {
                     Spacer(Modifier.height(8.dp))
                 }
 
                 item {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Upcoming KIIT Events",
+                            color = uiColors.textPrimary,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = {},
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                                contentDescription = "Notifications",
+                                tint = uiColors.textPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+                item {
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                item {
+                        UpcomingEventCard()
+                }
+                item {
+                    Spacer(Modifier.height(8.dp))
+                }
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = "Attendance",
@@ -370,27 +371,34 @@ fun HomeScreen(
                 }
                 // Horizontal Cards
                 item {
-                    OverallAttendanceCard(
-                        colors = uiColors,
-                        sapLoggedIn = sapLoggedIn,
-                        percentage = averageAttendancePercentage,
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            isLoginDialogOpen = true
-                        },
-                        onNavigate = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            navController.navigate(Destinations.Attendance) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                    ) {
+                        OverallAttendanceCard(
+                            colors = uiColors,
+                            sapLoggedIn = sapLoggedIn,
+                            percentageOverall = averageAttendancePercentage,
+                            percentageHighest = highestAttendancePercentage,
+                            percentageLowest = lowestAttendancePercentage,
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                isLoginDialogOpen = true
+                            },
+                            onNavigate = {
+                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                navController.navigate(Destinations.Attendance) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
+                            },
+                        )
+                    }
                 }
-
                 item {
                     Spacer(
                         modifier = Modifier.height(
@@ -461,15 +469,14 @@ fun HomeScreen(
             hazeState = hazeState
         )
     }
-    if(isLoginDialogOpen){
+    if (isLoginDialogOpen){
         LoginDialogBox(
             onDismiss = {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 isLoginDialogOpen = false
             },
-            onConfirm = {sapPassword->
+            onConfirm = { sapPassword->
                 haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                viewmodel.login(password = sapPassword)
+                viewmodel.login(sapPassword)
             },
             syncState = loginState,
             hazeState = hazeState
