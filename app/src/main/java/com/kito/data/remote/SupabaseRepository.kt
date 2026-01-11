@@ -1,7 +1,13 @@
 package com.kito.data.remote
 
+import android.view.PixelCopy.request
 import com.kito.data.local.db.section.SectionEntity
 import com.kito.data.local.db.student.StudentEntity
+import com.kito.data.remote.model.TeacherFuzzySearchModel
+import com.kito.data.remote.model.TeacherModel
+import com.kito.data.remote.model.TeacherScheduleByIDModel
+import com.kito.data.remote.request.TeacherScheduleByIDRequest
+import com.kito.data.remote.request.TeacherSearchRequest
 import javax.inject.Inject
 
 class SupabaseRepository @Inject constructor(
@@ -36,4 +42,23 @@ class SupabaseRepository @Inject constructor(
         )
     }
 
+    suspend fun getAllTeacherDetail(): List<TeacherModel> {
+        return api.getAllTeacherDetail()
+    }
+
+    suspend fun getTeacherSearchResponse(query: String): List<TeacherFuzzySearchModel> {
+        return api.getTeacherSearchResponse(
+            request = TeacherSearchRequest(
+                p_query = query
+            )
+        )
+    }
+
+    suspend fun getTeacherScheduleById(teacherId: Long): List<TeacherScheduleByIDModel> {
+        return api.getTeacherScheduleById(
+            request = TeacherScheduleByIDRequest(
+                p_teacher_id = teacherId
+            )
+        )
+    }
 }

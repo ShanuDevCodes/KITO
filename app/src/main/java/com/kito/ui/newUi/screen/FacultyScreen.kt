@@ -29,6 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -36,10 +38,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.kito.data.remote.model.dummyFacultyList
 import com.kito.ui.components.FacultyCardContent
 import com.kito.ui.components.UIColors
+import com.kito.ui.newUi.viewmodel.FacultyScreenViewModel
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -58,8 +62,11 @@ import dev.chrisbanes.haze.rememberHazeState
     ExperimentalHazeMaterialsApi::class, ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
-fun FacultyScreen(navController: NavHostController) {
-    val facultyList = dummyFacultyList
+fun FacultyScreen(
+    navController: NavHostController,
+    viewModel: FacultyScreenViewModel = hiltViewModel()
+) {
+    val facultyList by viewModel.faculty.collectAsState()
     val uiColors = UIColors()
     val hazeState = rememberHazeState()
     val cardHaze = rememberHazeState()
@@ -74,7 +81,7 @@ fun FacultyScreen(navController: NavHostController) {
                 bottom = 86.dp + WindowInsets.navigationBars.asPaddingValues()
                     .calculateBottomPadding()
             ),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
             modifier = Modifier
                 .hazeSource(hazeState)
                 .fillMaxSize()
