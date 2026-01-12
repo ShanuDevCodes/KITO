@@ -70,6 +70,16 @@ android {
                 "proguard-rules.pro"
             )
         }
+        create("internal_testing") {
+            initWith(getByName("release"))
+
+            resValue("string", "app_name", "KIITO (Testing)")
+            applicationIdSuffix = ".testing"
+            versionNameSuffix = "-testing"
+
+            isDebuggable = false   // 🔥 THIS FIXES MOST LAG
+            signingConfig = signingConfigs.getByName("debug")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

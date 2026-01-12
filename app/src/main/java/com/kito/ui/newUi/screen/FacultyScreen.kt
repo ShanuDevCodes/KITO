@@ -240,7 +240,7 @@ fun FacultyScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(100.dp),
+                            .heightIn(min = 100.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                         shape = RoundedCornerShape(
@@ -250,7 +250,7 @@ fun FacultyScreen(
                             bottomEnd = if (index == facultyList.size - 1) 24.dp else 4.dp
                         ),
                         onClick = {
-                            navController.navigate(Destinations.FacultyDetail(faculty.teacher_id)) {
+                            navController.navigate(Destinations.FacultyDetail(faculty.teacher_id?:0)) {
                                 launchSingleTop = true
                                 restoreState = true
                             }
@@ -280,7 +280,7 @@ fun FacultyScreen(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     FacultyCardContent(
-                                        facultyName = faculty.name,
+                                        facultyName = faculty.name?:"",
                                         facultyOffice = faculty.office_room,
                                         facultyEmail = faculty.email
                                     )
@@ -288,7 +288,7 @@ fun FacultyScreen(
 
                                 IconButton(
                                     onClick = {
-                                        navController.navigate(Destinations.FacultyDetail(faculty.teacher_id)) {
+                                        navController.navigate(Destinations.FacultyDetail(faculty.teacher_id?:0)) {
                                             launchSingleTop = true
                                             restoreState = true
                                         }
@@ -320,7 +320,7 @@ fun FacultyScreen(
                             bottomEnd = if (index == facultySearchResult.size - 1) 24.dp else 4.dp
                         ),
                         onClick = {
-                            navController.navigate(Destinations.FacultyDetail(faculty.teacher_id)) {
+                            navController.navigate(Destinations.FacultyDetail(faculty.teacher_id?:0)) {
                                 launchSingleTop = true
                                 restoreState = true
                             }
@@ -350,7 +350,7 @@ fun FacultyScreen(
                                     modifier = Modifier.weight(1f)
                                 ) {
                                     FacultyCardContent(
-                                        facultyName = faculty.name,
+                                        facultyName = faculty.name?:"",
                                         facultyOffice = faculty.office_room,
                                         facultyEmail = faculty.email
                                     )
@@ -358,7 +358,7 @@ fun FacultyScreen(
 
                                 IconButton(
                                     onClick = {
-                                        navController.navigate(Destinations.FacultyDetail(faculty.teacher_id)) {
+                                        navController.navigate(Destinations.FacultyDetail(faculty.teacher_id?:0)) {
                                             launchSingleTop = true
                                             restoreState = true
                                         }
@@ -415,6 +415,7 @@ fun FacultyScreen(
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = Color.White.copy(alpha = 0.08f),
+                            contentColor = uiColors.accentOrangeStart
                         ),
                         modifier = Modifier.size(32.dp)
                     ) {

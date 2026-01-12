@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -26,7 +27,9 @@ fun FacultyCardContent(
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
             color = uiColors.textPrimary,
-            style = MaterialTheme.typography.titleMediumEmphasized
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         Text(
@@ -40,7 +43,9 @@ fun FacultyCardContent(
             text = "Email: ${facultyEmail?:""}",
             fontFamily = FontFamily.Monospace,
             color = uiColors.textSecondary,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
