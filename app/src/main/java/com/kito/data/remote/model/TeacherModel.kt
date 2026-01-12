@@ -1,8 +1,11 @@
 package com.kito.data.remote.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class TeacherModel(
-    val email: String,
-    val name: String,
-    val office_room: String,
-    val teacher_id: Long
+    val email: String? = null,
+    val name: String? = null,
+    val office_room: String? = null,
+    val teacher_id: Long? = null
 )

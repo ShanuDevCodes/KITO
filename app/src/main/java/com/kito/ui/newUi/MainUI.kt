@@ -162,11 +162,11 @@ fun MainUI(
                                 animatedColor.copy(alpha = 0.3f),
                                 Color.Transparent
                             ),
-                            center = Offset(centerOffset, size.height * 0.7f),
+                            center = Offset(centerOffset, size.height * 0.55f),
                             radius = tabWidth * 0.7f
                         ),
                         radius = tabWidth * 0.7f,
-                        center = Offset(centerOffset, size.height * 0.7f)
+                        center = Offset(centerOffset, size.height * 0.55f)
                     )
 
                     val path = Path().apply {

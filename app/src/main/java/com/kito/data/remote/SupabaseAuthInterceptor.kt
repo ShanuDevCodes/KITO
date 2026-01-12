@@ -8,14 +8,12 @@ class SupabaseAuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
             .addHeader("apikey", BuildConfig.SUPABASE_ANON_KEY)
-            .addHeader(
-                "Authorization",
-                "Bearer ${BuildConfig.SUPABASE_ANON_KEY}"
-            )
+            .addHeader("Authorization", "Bearer ${BuildConfig.SUPABASE_ANON_KEY}")
+            .addHeader("Accept", "application/json")
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Prefer", "return=representation")
             .build()
 
-        val response = chain.proceed(request)
-
-        return response
+        return chain.proceed(request)
     }
 }
