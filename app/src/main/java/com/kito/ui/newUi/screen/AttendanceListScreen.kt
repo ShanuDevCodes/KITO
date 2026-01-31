@@ -851,7 +851,7 @@ private fun AttendanceDialog(
                                     text =
                                         "Tumse Na Ho Payega (required ${
                                             if (requiredClasses > 1000) {
-                                                "1000"
+                                                "1000+"
                                             }else {
                                                 requiredClasses
                                             }
