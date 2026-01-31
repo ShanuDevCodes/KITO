@@ -33,6 +33,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Dangerous
 import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.PersonAddAlt1
@@ -782,7 +783,7 @@ private fun AttendanceDialog(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            if (attendance.percentage < requiredAttendance.toDouble()) {
+//            if (attendance.percentage < requiredAttendance.toDouble()) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = Color.Transparent,
@@ -822,7 +823,13 @@ private fun AttendanceDialog(
                                 noiseFactor = 0.05f
                                 inputScale = HazeInputScale.Auto
                                 alpha = 0.98f
-                                tints = listOf(HazeTint(Color(0xFFA94F12).copy(alpha = 0.3f)))
+                                tints = listOf(HazeTint(
+                                    if(attendance.percentage < requiredAttendance.toDouble()) {
+                                        Color(0xFFA94F12).copy(alpha = 0.3f)
+                                    }else{
+                                        Color(0xFF169B27).copy(alpha = 0.3f)
+                                    }
+                                ))
                             }
                     ) {
                         Row(
@@ -830,14 +837,15 @@ private fun AttendanceDialog(
                                 .fillMaxWidth()
                                 .padding(horizontal = 8.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Dangerous,
+                                imageVector = if(attendance.percentage < requiredAttendance.toDouble()) Icons.Default.Dangerous else Icons.Default.CheckCircle,
                                 contentDescription = "Increase",
                                 modifier = Modifier.size(16.dp),
-                                tint = Color(0xFFEA6E1D)
+                                tint = if(attendance.percentage < requiredAttendance.toDouble()) Color(0xFFEA6E1D) else Color(0xFF169B27)
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
                             if (requiredClasses >= 50) {
                                 Text(
                                     text =
@@ -853,10 +861,19 @@ private fun AttendanceDialog(
                                     style = MaterialTheme.typography.labelSmallEmphasized,
                                     modifier = Modifier
                                 )
-                            }else {
+                            }else if (requiredClasses > 0) {
                                 Text(
                                     text =
                                         "Attend $requiredClasses more classes to reach $requiredAttendance%",
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.labelSmallEmphasized,
+                                    modifier = Modifier
+                                )
+                            } else{
+                                Text(
+                                    text =
+                                        "Attendance is above $requiredAttendance%",
                                     fontFamily = FontFamily.Monospace,
                                     fontWeight = FontWeight.Bold,
                                     style = MaterialTheme.typography.labelSmallEmphasized,
@@ -867,7 +884,7 @@ private fun AttendanceDialog(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-            }
+//            }
         }
     }
 }
