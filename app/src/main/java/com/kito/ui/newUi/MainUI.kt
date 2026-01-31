@@ -1,10 +1,23 @@
 package com.kito.ui.newUi
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -19,6 +32,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,22 +51,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
+import androidx.navigation.toRoute
+import com.kito.ui.components.ExpressiveEasing
 import com.kito.ui.navigation.BottomBarTab
 import com.kito.ui.navigation.BottomBarTabs
-import com.kito.ui.navigation.Destinations
+import com.kito.ui.navigation.RootDestination
+import com.kito.ui.navigation.TabDestination
 import com.kito.ui.navigation.tabs
 import com.kito.ui.newUi.screen.AttendanceListScreen
+import com.kito.ui.newUi.screen.FacultyDetailScreen
+import com.kito.ui.newUi.screen.FacultyScreen
 import com.kito.ui.newUi.screen.HomeScreen
+import com.kito.ui.newUi.screen.ScheduleScreen
 import com.kito.ui.newUi.screen.SettingsScreen
+import com.kito.ui.newUi.screen.UpcomingExamScreen
 import com.kito.ui.newUi.viewmodel.AppViewModel
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
@@ -62,7 +88,8 @@ import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalHazeMaterialsApi::class, ExperimentalHazeApi::class
 )
@@ -73,21 +100,31 @@ fun MainUI(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val shouldShowBottomBar = currentDestination?.hierarchy?.any { it.hasRoute<RootDestination.Tabs>() } == true
+    val snackbarHostState = remember { SnackbarHostState() }
+    val activity = LocalContext.current as Activity
+    val intent = activity.intent
+    LaunchedEffect(intent) {
+        val data = intent.data ?: return@LaunchedEffect
 
+        if (data.scheme == "kito" && data.host == "schedule") {
+            navController.navigate(RootDestination.Schedule) {
+                launchSingleTop = true
+            }
+            activity.intent = Intent(activity, activity::class.java)
+        }
+    }
     LaunchedEffect(Unit) {
         appViewModel.checkResetFix()
     }
-    // Sync selectedTabIndex with currentDestination
     LaunchedEffect(currentDestination) {
-        currentDestination?.let { dest ->
-            selectedTabIndex = when {
-                dest.hasRoute<Destinations.Home>() -> 0
-                dest.hasRoute<Destinations.Attendance>() -> 1
-                dest.hasRoute<Destinations.Profile>() -> 2
-                else -> 0
-            }
+        selectedTabIndex = when {
+            currentDestination?.hasRoute<TabDestination.Home>() == true -> 0
+            currentDestination?.hasRoute<TabDestination.Attendance>() == true -> 1
+            currentDestination?.hasRoute<TabDestination.Faculty>() == true -> 2
+            currentDestination?.hasRoute<TabDestination.Profile>() == true -> 3
+            else -> selectedTabIndex
         }
     }
 
@@ -95,141 +132,249 @@ fun MainUI(
 
     Scaffold(
         containerColor = Color.Transparent,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            Box(
-                modifier = Modifier
-                    .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding())
-                    .padding(vertical = 10.dp, horizontal = 64.dp)
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .clip(CircleShape)
-//                    .hazeEffect(
-//                        state = hazeState,
-//                        style = HazeStyle(
-//                            tint = HazeTint(Color.White.copy(alpha = 0.05f)),
-//                            blurRadius = 25.dp
-//                        )
-//                    )
-                    .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
-                        blurRadius = 15.dp
-                        noiseFactor = 0.05f
-                        inputScale = HazeInputScale.Auto
-                        alpha = 0.98f
-                    }
-                    .border(
-                        width = Dp.Hairline,
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = 0.5f),
-                                Color.White.copy(alpha = 0.1f),
-                            )
-                        ),
-                        shape = CircleShape
-                    )
+            AnimatedVisibility(
+                visible = shouldShowBottomBar,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                )
             ) {
-                val animatedSelectedTabIndex by animateFloatAsState(
-                    targetValue = selectedTabIndex.toFloat(),
-                    label = "animatedSelectedTabIndex",
-                    animationSpec = spring(
-                        stiffness = Spring.StiffnessLow,
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                    )
-                )
-
-                val animatedColor by animateColorAsState(
-                    targetValue = if (selectedTabIndex in tabs.indices) tabs[selectedTabIndex].color else Color.White,
-                    label = "animatedColor",
-                    animationSpec = spring(
-                        stiffness = Spring.StiffnessLow,
-                    )
-                )
-
-                Canvas(
-                    modifier = Modifier.fillMaxSize()
+                Box(
+                    modifier = Modifier
+                        .padding(
+                            bottom = WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding()
+                        )
+                        .padding(vertical = 10.dp, horizontal = 64.dp)
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clip(CircleShape)
+                        .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
+                            blurRadius = 15.dp
+                            noiseFactor = 0.05f
+                            inputScale = HazeInputScale.Auto
+                            alpha = 0.98f
+                        }
+                        .border(
+                            width = Dp.Hairline,
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.White.copy(alpha = 0.5f),
+                                    Color.White.copy(alpha = 0.1f),
+                                )
+                            ),
+                            shape = CircleShape
+                        )
                 ) {
-                    val tabWidth = size.width / tabs.size
-                    val centerOffset = tabWidth * animatedSelectedTabIndex + tabWidth / 2
-
-                    // 1. Reduced Background Glow
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            colors = listOf(
-                                animatedColor.copy(alpha = 0.3f),
-                                Color.Transparent
-                            ),
-                            center = Offset(centerOffset, size.height * 0.7f),
-                            radius = tabWidth * 0.7f
-                        ),
-                        radius = tabWidth * 0.7f,
-                        center = Offset(centerOffset, size.height * 0.7f)
+                    val animatedSelectedTabIndex by animateFloatAsState(
+                        targetValue = selectedTabIndex.toFloat(),
+                        label = "animatedSelectedTabIndex",
+                        animationSpec = spring(
+                            stiffness = Spring.StiffnessLow,
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                        )
                     )
 
-                    val path = Path().apply {
-                        addRoundRect(RoundRect(size.toRect(), CornerRadius(size.height / 2f)))
-                    }
-                    val measure = PathMeasure()
-                    measure.setPath(path, false)
-                    val length = measure.length
+                    val animatedColor by animateColorAsState(
+                        targetValue = if (selectedTabIndex in tabs.indices) tabs[selectedTabIndex].color else Color.White,
+                        label = "animatedColor",
+                        animationSpec = spring(
+                            stiffness = Spring.StiffnessLow,
+                        )
+                    )
 
-                    // 2. Focused Bottom Edge Light
-                    drawPath(
-                        path = path,
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                animatedColor.copy(alpha = 0.5f),
-                                animatedColor,
-                                animatedColor.copy(alpha = 0.5f),
-                                Color.Transparent,
+                    Canvas(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val tabWidth = size.width / tabs.size
+                        val centerOffset = tabWidth * animatedSelectedTabIndex + tabWidth / 2
+
+                        drawCircle(
+                            brush = Brush.radialGradient(
+                                colors = listOf(
+                                    animatedColor.copy(alpha = 0.3f),
+                                    Color.Transparent
+                                ),
+                                center = Offset(centerOffset, size.height * 0.55f),
+                                radius = tabWidth * 0.7f
                             ),
-                            startX = centerOffset - (tabWidth * 0.6f),
-                            endX = centerOffset + (tabWidth * 0.6f),
-                        ),
-                        style = Stroke(width = 5f)
+                            radius = tabWidth * 0.7f,
+                            center = Offset(centerOffset, size.height * 0.55f)
+                        )
+
+                        val path = Path().apply {
+                            addRoundRect(RoundRect(size.toRect(), CornerRadius(size.height / 2f)))
+                        }
+                        val measure = PathMeasure()
+                        measure.setPath(path, false)
+                        drawPath(
+                            path = path,
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    animatedColor.copy(alpha = 0.5f),
+                                    animatedColor,
+                                    animatedColor.copy(alpha = 0.5f),
+                                    Color.Transparent,
+                                ),
+                                startX = centerOffset - (tabWidth * 0.6f),
+                                endX = centerOffset + (tabWidth * 0.6f),
+                            ),
+                            style = Stroke(width = 5f)
+                        )
+                    }
+
+                    BottomBarTabs(
+                        tabs = tabs,
+                        selectedTab = selectedTabIndex,
+                        onTabSelected = { tab ->
+                            val destination = when (tab) {
+                                BottomBarTab.Home -> TabDestination.Home
+                                BottomBarTab.Attendance -> TabDestination.Attendance
+                                BottomBarTab.Faculty -> TabDestination.Faculty
+                                BottomBarTab.Settings -> TabDestination.Profile
+                            }
+                            navController.navigate(destination) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
                     )
                 }
-
-                BottomBarTabs(
-                    tabs = tabs,
-                    selectedTab = selectedTabIndex,
-                    onTabSelected = { tab ->
-                        val destination = when (tab) {
-                            is BottomBarTab.Home -> Destinations.Home
-                            is BottomBarTab.Attendance -> Destinations.Attendance
-                            is BottomBarTab.Settings -> Destinations.Profile
-                        }
-                        navController.navigate(destination) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
             }
         }
     ) {
         NavHost(
             navController = navController,
-            startDestination = Destinations.Home,
-            modifier = Modifier
-                .fillMaxSize()
-                .hazeSource(state = hazeState),
+            startDestination = RootDestination.Tabs,
+            modifier = Modifier.hazeSource(hazeState),
+            enterTransition = {
+                if (
+                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                ) {
+                    fadeIn(
+                        animationSpec = tween(
+                            durationMillis = 400,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }else {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }
+            },
+            exitTransition = {
+                if (
+                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                ) {
+                    fadeOut(
+                        animationSpec = tween(
+                            durationMillis = 400,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }else{
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                        animationSpec = tween(
+                            durationMillis = 600,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }
+            },
+            popEnterTransition = {
+                if (
+                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                ) {
+                    fadeIn(
+                        animationSpec = tween(
+                            durationMillis = 400,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }else {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }
+            },
+            popExitTransition = {
+                if (
+                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                ) {
+                    fadeOut(
+                        animationSpec = tween(
+                            durationMillis = 400,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }else {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = ExpressiveEasing.Emphasized
+                        )
+                    )
+                }
+            }
         ) {
-            composable<Destinations.Home> {
-                HomeScreen(
-                    navController = navController
+            navigation<RootDestination.Tabs>(
+                startDestination = TabDestination.Home,
+            ) {
+                composable<TabDestination.Home> {
+                    HomeScreen(
+                        navController = navController
+                    )
+                }
+                composable<TabDestination.Attendance> {
+                    AttendanceListScreen(navController = navController)
+                }
+                composable<TabDestination.Faculty> {
+                    FacultyScreen(navController)
+                }
+                composable<TabDestination.Profile> {
+                    SettingsScreen(
+                        navController = navController,
+                        snackbarHostState = snackbarHostState
+                    )
+                }
+            }
+            composable<RootDestination.Schedule> {
+                ScheduleScreen()
+            }
+            composable<RootDestination.FacultyDetail> { backStackEntry ->
+                val args = backStackEntry.toRoute<RootDestination.FacultyDetail>()
+                val facultyId = args.facultyId
+                FacultyDetailScreen(
+                    facultyId = facultyId
                 )
             }
-            composable<Destinations.Attendance> {
-                AttendanceListScreen(
-                    navController = navController
-                )
-            }
-            composable<Destinations.Profile> {
-                SettingsScreen()
+            composable<RootDestination.ExamSchedule> {
+                UpcomingExamScreen()
             }
         }
     }
 }
+
+private fun NavDestination.isInTabs(): Boolean =
+    hierarchy.any { it.hasRoute<RootDestination.Tabs>() }

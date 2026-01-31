@@ -4,17 +4,19 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -59,14 +62,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.kito.R
-import com.kito.ScheduleActivity
 import com.kito.ui.components.AboutELabsDialog
 import com.kito.ui.components.OverallAttendanceCard
 import com.kito.ui.components.ScheduleCard
 import com.kito.ui.components.UIColors
-import com.kito.ui.components.UpcomingEventCard
+import com.kito.ui.components.UpcomingExamCard
+import com.kito.ui.components.settingsdialog.LoginDialogBox
 import com.kito.ui.components.state.SyncUiState
-import com.kito.ui.navigation.Destinations
+import com.kito.ui.navigation.RootDestination
+import com.kito.ui.navigation.TabDestination
 import com.kito.ui.newUi.viewmodel.HomeViewmodel
 import com.kito.widget.TimeTableAppWidget
 import com.kito.widget.TimetableWidget
@@ -81,6 +85,7 @@ import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalHazeApi::class,
     ExperimentalHazeMaterialsApi::class
 )
@@ -94,12 +99,25 @@ fun HomeScreen(
     val name by viewmodel.name.collectAsState()
     val sapLoggedIn by viewmodel.sapLoggedIn.collectAsState()
     val averageAttendancePercentage by viewmodel.averageAttendancePercentage.collectAsState()
+    val highestAttendancePercentage by viewmodel.highestAttendancePercentage.collectAsState()
+    val lowestAttendancePercentage by viewmodel.lowestAttendancePercentage.collectAsState()
     val schedule by viewmodel.schedule.collectAsState()
     val syncState by viewmodel.syncState.collectAsState()
     val context = LocalContext.current
     val hazeState = rememberHazeState()
     val haptic = LocalHapticFeedback.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    var isLoginDialogOpen by remember { mutableStateOf(false) }
+    val loginState by viewmodel.loginState.collectAsState()
+    val isOnline by viewmodel.isOnline.collectAsState()
+    val examModel by viewmodel.examModel.collectAsState()
+    LaunchedEffect(loginState) {
+        if (loginState is SyncUiState.Success) {
+            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+            isLoginDialogOpen = false
+            viewmodel.setLoginStateIdle()
+        }
+    }
     LaunchedEffect(lifecycleOwner) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(
             Lifecycle.State.STARTED
@@ -110,15 +128,24 @@ fun HomeScreen(
                 DayOfWeek.WEDNESDAY -> "WED"
                 DayOfWeek.THURSDAY -> "THU"
                 DayOfWeek.FRIDAY -> "FRI"
-                else -> "MON"
+                DayOfWeek.SATURDAY -> "SAT"
+                DayOfWeek.SUNDAY -> "SUN"
             }
-
             viewmodel.updateDay(today)
+            viewmodel.getExamSchedule()
         }
     }
     LaunchedEffect(Unit) {
         delay(1000)
-        viewmodel.syncOnStartup()
+        if (isOnline) {
+            viewmodel.syncOnStartup()
+        }else{
+            Toast.makeText(
+                context,
+                "No Internet Connection",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -157,235 +184,278 @@ fun HomeScreen(
     }
 
     Box() {
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp)
                 .hazeSource(hazeState)
         ) {
-            LazyColumn() {
-                item {
-                    Spacer(
-                        modifier = Modifier.height(
-                            72.dp + WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                        )
-                    )
-                }
+            Box(
+                Modifier
+                    .background(Color(0xFF121116))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp)
+                ) {
+                    LazyColumn() {
+                        item {
+                            Spacer(
+                                modifier = Modifier.height(
+                                    72.dp + WindowInsets.statusBars.asPaddingValues()
+                                        .calculateTopPadding()
+                                )
+                            )
+                        }
 
-                item {
-                    AnimatedVisibility(syncState is SyncUiState.Loading) {
-                        Column {
+                        item {
+                            AnimatedVisibility(syncState is SyncUiState.Loading) {
+                                Column {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    LinearWavyProgressIndicator(
+                                        color = uiColors.accentOrangeStart,
+                                        trackColor = uiColors.progressAccent,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        waveSpeed = 5.dp,
+                                        wavelength = 70.dp,
+                                    )
+                                }
+                            }
+                        }
+
+
+                        item {
                             Spacer(modifier = Modifier.height(8.dp))
-                            LinearWavyProgressIndicator(
-                                color = uiColors.accentOrangeStart,
-                                trackColor = uiColors.progressAccent,
-                                modifier = Modifier.fillMaxWidth(),
-                                waveSpeed = 5.dp,
-                                wavelength = 70.dp,
-                            )
                         }
-                    }
-                }
 
-
-                item {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Today's Schedule",
-                            color = uiColors.textPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = {
-                                val subject = Uri.encode("KIITO Schedule Report")
-                                val body = Uri.encode("")
-                                val intent = Intent(
-                                    Intent.ACTION_SENDTO,
-                                    Uri.parse("mailto:elabs.kiito@gmail.com?subject=$subject&body=$body")
-                                )
-
-                                context.startActivity(intent)
-                            },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = Color(0xFFB32727)
-                            ),
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Report,
-                                contentDescription = "Report",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                val intent = Intent(context, ScheduleActivity::class.java)
-                                context.startActivity(intent)
-                            },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                                contentDescription = "Notifications",
-                                tint = uiColors.textPrimary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                // Schedule Section
-                item {
-                    ScheduleCard(
-                        colors = uiColors,
-                        schedule = schedule,
-                        onCLick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            val intent = Intent(context, ScheduleActivity::class.java)
-                            context.startActivity(intent)
-                        }
-                    )
-                }
-
-                item {
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Overall Attendance",
-                            color = uiColors.textPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                navController.navigate(Destinations.Attendance) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            modifier = Modifier.size(28.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                                contentDescription = "Notifications",
-                                tint = uiColors.textPrimary,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    Spacer(Modifier.height(8.dp))
-                }
-
-                // Horizontal Cards
-                item {
-                    OverallAttendanceCard(
-                        colors = uiColors,
-                        sapLoggedIn = sapLoggedIn,
-                        percentage = averageAttendancePercentage,
-                        onClick = {
-                            navController.navigate(Destinations.Profile) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        onNavigate = {
-                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                            navController.navigate(Destinations.Attendance) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-                }
-                if (false) {
-                    item {
-                        Spacer(Modifier.height(8.dp))
-                    }
-
-                    item {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Upcoming KIIT Events",
-                                color = uiColors.textPrimary,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(
-                                onClick = {},
-                                modifier = Modifier.size(28.dp)
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                                    contentDescription = "Notifications",
-                                    tint = uiColors.textPrimary,
-                                    modifier = Modifier.size(16.dp)
+                                Text(
+                                    text = "Today's Schedule",
+                                    color = uiColors.textPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                )
+                                IconButton(
+                                    onClick = {
+                                        val subject = Uri.encode("KIITO Schedule Report")
+                                        val body = Uri.encode("")
+                                        val intent = Intent(
+                                            Intent.ACTION_SENDTO,
+                                            "mailto:elabs.kiito@gmail.com?subject=$subject&body=$body".toUri()
+                                        )
+
+                                        context.startActivity(intent)
+                                    },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        contentColor = Color(0xFFB32727)
+                                    ),
+                                    modifier = Modifier.size(28.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Report,
+                                        contentDescription = "Report",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        navController.navigate(RootDestination.Schedule)
+                                    },
+                                    modifier = Modifier.size(28.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                                        contentDescription = "Notifications",
+                                        tint = uiColors.textPrimary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        item {
+                            Spacer(Modifier.height(8.dp))
+                        }
+
+                        // Schedule Section
+                        item {
+                            ScheduleCard(
+                                colors = uiColors,
+                                schedule = schedule,
+                                onCLick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                    navController.navigate(RootDestination.Schedule)
+                                }
+                            )
+                        }
+                        item {
+                            Spacer(Modifier.height(8.dp))
+                        }
+
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "Upcoming Exam Schedule",
+                                    color = uiColors.textPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                IconButton(
+                                    onClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        navController.navigate(RootDestination.ExamSchedule)
+                                    },
+                                    modifier = Modifier.size(28.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                                        contentDescription = "Notifications",
+                                        tint = uiColors.textPrimary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                        if(examModel != null) {
+                            item {
+                                Spacer(Modifier.height(8.dp))
+                            }
+
+                            item {
+                                UpcomingExamCard(
+                                    item = examModel,
+                                    onClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        navController.navigate(RootDestination.ExamSchedule)
+                                    }
                                 )
                             }
                         }
-                    }
-                    item {
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn() + expandVertically()
-                        ) {
-                            Text("Updating")
+//                        item {
+//                            Spacer(Modifier.height(8.dp))
+//                        }
+//
+//                        item {
+//                            Row(
+//                                verticalAlignment = Alignment.CenterVertically,
+//                            ) {
+//                                Text(
+//                                    text = "Upcoming KIIT Events",
+//                                    color = uiColors.textPrimary,
+//                                    fontWeight = FontWeight.Bold,
+//                                    fontFamily = FontFamily.Monospace,
+//                                    style = MaterialTheme.typography.titleMedium,
+//                                    modifier = Modifier.weight(1f)
+//                                )
+//                                IconButton(
+//                                    onClick = {},
+//                                    modifier = Modifier.size(28.dp)
+//                                ) {
+//                                    Icon(
+//                                        imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+//                                        contentDescription = "Notifications",
+//                                        tint = uiColors.textPrimary,
+//                                        modifier = Modifier.size(16.dp)
+//                                    )
+//                                }
+//                            }
+//                        }
+//                        item {
+//                            Spacer(Modifier.height(8.dp))
+//                        }
+//
+//                        item {
+//                            UpcomingEventCard()
+//                        }
+                        item {
+                            Spacer(Modifier.height(8.dp))
+                        }
+                        item {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "Attendance",
+                                    color = uiColors.textPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                IconButton(
+                                    onClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        navController.navigate(TabDestination.Attendance) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+                                    modifier = Modifier.size(28.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                                        contentDescription = "Notifications",
+                                        tint = uiColors.textPrimary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                        item {
+                            Spacer(Modifier.height(8.dp))
+                        }
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                            ) {
+                                OverallAttendanceCard(
+                                    colors = uiColors,
+                                    sapLoggedIn = sapLoggedIn,
+                                    percentageOverall = averageAttendancePercentage,
+                                    percentageHighest = highestAttendancePercentage,
+                                    percentageLowest = lowestAttendancePercentage,
+                                    onClick = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        isLoginDialogOpen = true
+                                    },
+                                    onNavigate = {
+                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                        navController.navigate(TabDestination.Attendance) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(
+                                modifier = Modifier.height(
+                                    86.dp + WindowInsets.navigationBars.asPaddingValues()
+                                        .calculateBottomPadding()
+                                )
+                            )
                         }
                     }
-
-                    item {
-                        Spacer(Modifier.height(8.dp))
-                    }
-
-                    item {
-                        UpcomingEventCard()
-                    }
-                }
-
-                item {
-                    Spacer(
-                        modifier = Modifier.height(
-                            86.dp + WindowInsets.navigationBars.asPaddingValues()
-                                .calculateBottomPadding()
-                        )
-                    )
                 }
             }
         }
@@ -430,7 +500,10 @@ fun HomeScreen(
                     )
                 }
                 IconButton(
-                    onClick = { showAboutDialog = !showAboutDialog },
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                        showAboutDialog = !showAboutDialog
+                    },
                     modifier = Modifier.size(60.dp)
                 ) {
                     Image(
@@ -444,8 +517,26 @@ fun HomeScreen(
     }
     if (showAboutDialog) {
         AboutELabsDialog(
-            onDismiss = { showAboutDialog = false },
+            onDismiss = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                showAboutDialog = false
+            },
             context = LocalContext.current,
+            hazeState = hazeState
+        )
+    }
+    if (isLoginDialogOpen){
+        LoginDialogBox(
+            onDismiss = {
+                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                isLoginDialogOpen = false
+                viewmodel.setLoginStateIdle()
+            },
+            onConfirm = { sapPassword->
+                haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                viewmodel.login(sapPassword)
+            },
+            syncState = loginState,
             hazeState = hazeState
         )
     }

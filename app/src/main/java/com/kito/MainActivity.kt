@@ -1,6 +1,7 @@
 package com.kito
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -25,10 +28,12 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.kito.data.local.preferences.PrefsRepository
+import com.kito.notification.NotificationPipelineController
 import com.kito.ui.newUi.MainUI
 import com.kito.ui.theme.KitoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -36,7 +41,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var prefs: PrefsRepository
-
+    private val notificationPipelineController by lazy {
+        NotificationPipelineController.get(applicationContext)
+    }
     private lateinit var appUpdateManager: AppUpdateManager
 
     private val updateLauncher: ActivityResultLauncher<IntentSenderRequest> =
@@ -59,6 +66,7 @@ class MainActivity : ComponentActivity() {
         checkForUpdate()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -66,9 +74,8 @@ class MainActivity : ComponentActivity() {
         appUpdateManager = AppUpdateManagerFactory.create(this)
         setContent {
             var keepOnScreenCondition by remember { mutableStateOf(true) }
-
-            // 🔁 Routing logic (onboarding / setup)
             LaunchedEffect(Unit) {
+                notificationPipelineController.sync()
                 val onboardingDone = prefs.onBoardingFlow.first()
                 val isUserSetupDone = prefs.userSetupDoneFlow.first()
                 when {
@@ -115,9 +122,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-
         appUpdateManager.registerListener(installStateListener)
-
         appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
             if (
                 info.updateAvailability() ==
@@ -129,6 +134,9 @@ class MainActivity : ComponentActivity() {
                     AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
                 )
             }
+        }
+        lifecycleScope.launch {
+            notificationPipelineController.sync()
         }
     }
 

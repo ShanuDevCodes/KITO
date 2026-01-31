@@ -46,11 +46,9 @@ interface StudentSectionDAO {
             ON sec.section = stu.section
            AND sec.batch = stu.batch
         WHERE stu.roll_no = :rollNo
-          AND sec.day = :day
         ORDER BY sec.start_time
     """)
-    fun getScheduleForStudentBlocking(
-        rollNo: String,
-        day: String
-    ): List<StudentSectionEntity>
+    fun getAllScheduleForStudent(
+        rollNo: String
+    ): Flow<List<StudentSectionEntity>>
 }

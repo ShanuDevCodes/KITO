@@ -35,6 +35,7 @@ fetch_attendance.js
 *.ap_
 **/build/
 **/release/
+**/internal_testing/
 
 # Java
 *.class

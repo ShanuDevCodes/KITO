@@ -2,12 +2,34 @@ package com.kito.ui.navigation
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
-sealed class Destinations {
+sealed interface RootDestination {
+
     @Serializable
-    object Home: Destinations()
+    object Tabs : RootDestination
+
     @Serializable
-    object Attendance: Destinations()
+    object Schedule : RootDestination
+
     @Serializable
-    object Profile: Destinations()
+    data class FacultyDetail(val facultyId: Long) : RootDestination
+    @Serializable
+    object ExamSchedule : RootDestination
+}
+
+@Serializable
+sealed interface TabDestination {
+
+    @Serializable
+    object Home : TabDestination
+
+    @Serializable
+    object Attendance : TabDestination
+
+    @Serializable
+    object Faculty : TabDestination
+
+    @Serializable
+    object Profile : TabDestination
 }

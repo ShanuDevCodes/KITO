@@ -13,12 +13,16 @@ import com.kito.data.local.db.student.StudentDAO
 import com.kito.data.local.db.studentsection.StudentSectionDAO
 import com.kito.data.remote.SupabaseApi
 import com.kito.data.remote.SupabaseAuthInterceptor
+import com.kito.ui.components.ApplicationScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import jakarta.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -47,7 +51,7 @@ object AppModule {
             context,
             AppDB::class.java,
             "kito_db"
-        ).allowMainThreadQueries().build()
+        ).build()
 
     @Provides
     fun provideUserDao(db: AppDB): AttendanceDAO =
@@ -89,4 +93,10 @@ object AppModule {
     ): SupabaseApi {
         return retrofit.create(SupabaseApi::class.java)
     }
+
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(): CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Default)
 }
