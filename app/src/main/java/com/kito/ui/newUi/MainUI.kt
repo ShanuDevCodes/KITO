@@ -347,7 +347,7 @@ fun MainUI(
                     )
                 }
                 composable<TabDestination.Attendance> {
-                    AttendanceListScreen(navController = navController)
+                    AttendanceListScreen()
                 }
                 composable<TabDestination.Faculty> {
                     FacultyScreen(navController)
