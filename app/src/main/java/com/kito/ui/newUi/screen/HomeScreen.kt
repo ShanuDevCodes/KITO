@@ -298,36 +298,35 @@ fun HomeScreen(
                         item {
                             Spacer(Modifier.height(8.dp))
                         }
-
-                        item {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = "Upcoming Exam Schedule",
-                                    color = uiColors.textPrimary,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = FontFamily.Monospace,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                IconButton(
-                                    onClick = {
-                                        haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        navController.navigate(RootDestination.ExamSchedule)
-                                    },
-                                    modifier = Modifier.size(28.dp)
+                        if(examModel != null) {
+                            item {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
-                                        contentDescription = "Notifications",
-                                        tint = uiColors.textPrimary,
-                                        modifier = Modifier.size(16.dp)
+                                    Text(
+                                        text = "Upcoming Exam Schedule",
+                                        color = uiColors.textPrimary,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = FontFamily.Monospace,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.weight(1f)
                                     )
+                                    IconButton(
+                                        onClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+                                            navController.navigate(RootDestination.ExamSchedule)
+                                        },
+                                        modifier = Modifier.size(28.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Default.ArrowForwardIos,
+                                            contentDescription = "Notifications",
+                                            tint = uiColors.textPrimary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 }
                             }
-                        }
-                        if(examModel != null) {
                             item {
                                 Spacer(Modifier.height(8.dp))
                             }
