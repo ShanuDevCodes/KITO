@@ -841,7 +841,13 @@ private fun AttendanceDialog(
                             if (requiredClasses >= 50) {
                                 Text(
                                     text =
-                                        "Tumse Na Ho Payega (required $requiredClasses)",
+                                        "Tumse Na Ho Payega (required ${
+                                            if (requiredClasses > 1000) {
+                                                "1000"
+                                            }else {
+                                                requiredClasses
+                                            }
+                                        })",
                                     fontFamily = FontFamily.Monospace,
                                     fontWeight = FontWeight.Bold,
                                     style = MaterialTheme.typography.labelSmallEmphasized,
