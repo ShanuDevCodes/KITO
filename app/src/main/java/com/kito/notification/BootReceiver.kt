@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.kito.widget.WidgetWorkScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ class BootReceiver : BroadcastReceiver() {
             try {
                 val notificationPipelineController = NotificationPipelineController.get(context)
                 notificationPipelineController.sync()
+                WidgetWorkScheduler.ensureWorkerScheduled(context)
             }finally {
                 pendingResult.finish()
             }
