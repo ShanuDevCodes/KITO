@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import com.kito.data.local.db.studentsection.StudentSectionEntity
 import com.kito.ui.components.animation.PageNotFoundAnimation
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
@@ -55,6 +58,15 @@ fun ScheduleCard(
     val now = rememberLifecycleAwareCurrentTime()
     val (ongoing, upcomingList) = remember(schedule, now) {
         findOngoingAndAllUpcoming(schedule, now)
+    }
+    val today = when (LocalDate.now().dayOfWeek) {
+        DayOfWeek.MONDAY -> "MON"
+        DayOfWeek.TUESDAY -> "TUE"
+        DayOfWeek.WEDNESDAY -> "WED"
+        DayOfWeek.THURSDAY -> "THU"
+        DayOfWeek.FRIDAY -> "FRI"
+        DayOfWeek.SATURDAY -> "SAT"
+        DayOfWeek.SUNDAY -> "SUN"
     }
     val meshColors = listOf(
         Color(0xFF77280F).copy(alpha = 0.82f), // burnt orange
@@ -107,107 +119,136 @@ fun ScheduleCard(
             item{
                 Spacer(modifier = Modifier.height(4.dp))
             }
-            if (ongoing != null) {
-                item {
-                    Text(
-                        text = "Ongoing",
-                        color = colors.textSecondary,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                item {
-                    Card(
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.Transparent
+            if(schedule.isNotEmpty()) {
+                if (ongoing != null) {
+                    item {
+                        Text(
+                            text = "Ongoing",
+                            color = colors.textSecondary,
+                            fontFamily = FontFamily.Monospace
                         )
-                    ) {
-                        Box(modifier = Modifier
-                            .clip(
-                                RoundedCornerShape(12.dp)
-                            )
-                            .meshGradient(
-                                points = listOf(
-                                // ───── TOP ROW ─────
-                                    listOf(
-                                        Offset(0f, 0f) to meshColorAnimators[0].value,
-                                        Offset(0.25f, 0f) to meshColorAnimators[1].value,
-                                        Offset(0.5f, 0f) to meshColorAnimators[2].value,
-                                        Offset(0.75f, 0f) to meshColorAnimators[3].value,
-                                        Offset(1f, 0f) to meshColorAnimators[4].value,
-                                    ),
-
-                                    // ───── MIDDLE ROW (curved glow band) ─────
-                                    listOf(
-                                        Offset(-0.05f, 0.55f) to meshColorAnimators[5].value,
-                                        Offset(0.2f, animatedPointTop.value) to meshColorAnimators[6].value,
-                                        Offset(0.5f, 0.6f) to meshColorAnimators[7].value,
-                                        Offset(0.8f, animatedPointMid.value) to meshColorAnimators[8].value,
-                                        Offset(1.05f, 0.55f) to meshColorAnimators[9].value,
-                                    ),
-
-                                    // ───── BOTTOM ROW (independent animation per point) ─────
-                                    listOf(
-                                        Offset(0f, 1f) to meshColorAnimators[10].value,
-                                        Offset(0.25f, 1f) to meshColorAnimators[11].value,
-                                        Offset(0.5f, 1f) to meshColorAnimators[12].value,
-                                        Offset(0.75f, 1f) to meshColorAnimators[13].value,
-                                        Offset(1f, 1f) to meshColorAnimators[14].value,
-                                    ),
-                                ),
-                                resolutionX = 30
+                    }
+                    item {
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.Transparent
                             )
                         ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp)
+                            Box(
+                                modifier = Modifier
+                                    .clip(
+                                        RoundedCornerShape(12.dp)
+                                    )
+                                    .meshGradient(
+                                        points = listOf(
+                                            // ───── TOP ROW ─────
+                                            listOf(
+                                                Offset(0f, 0f) to meshColorAnimators[0].value,
+                                                Offset(0.25f, 0f) to meshColorAnimators[1].value,
+                                                Offset(0.5f, 0f) to meshColorAnimators[2].value,
+                                                Offset(0.75f, 0f) to meshColorAnimators[3].value,
+                                                Offset(1f, 0f) to meshColorAnimators[4].value,
+                                            ),
+
+                                            // ───── MIDDLE ROW (curved glow band) ─────
+                                            listOf(
+                                                Offset(
+                                                    -0.05f,
+                                                    0.55f
+                                                ) to meshColorAnimators[5].value,
+                                                Offset(
+                                                    0.2f,
+                                                    animatedPointTop.value
+                                                ) to meshColorAnimators[6].value,
+                                                Offset(0.5f, 0.6f) to meshColorAnimators[7].value,
+                                                Offset(
+                                                    0.8f,
+                                                    animatedPointMid.value
+                                                ) to meshColorAnimators[8].value,
+                                                Offset(1.05f, 0.55f) to meshColorAnimators[9].value,
+                                            ),
+
+                                            // ───── BOTTOM ROW (independent animation per point) ─────
+                                            listOf(
+                                                Offset(0f, 1f) to meshColorAnimators[10].value,
+                                                Offset(0.25f, 1f) to meshColorAnimators[11].value,
+                                                Offset(0.5f, 1f) to meshColorAnimators[12].value,
+                                                Offset(0.75f, 1f) to meshColorAnimators[13].value,
+                                                Offset(1f, 1f) to meshColorAnimators[14].value,
+                                            ),
+                                        ),
+                                        resolutionX = 30
+                                    )
                             ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp)
+                                ) {
+                                    ScheduleItem(
+                                        title = ongoing.subject,
+                                        time = "${formatTo12Hour(ongoing.startTime)} - ${
+                                            formatTo12Hour(ongoing.endTime)
+                                        }",
+                                        room = ongoing.room ?: "No Room",
+                                        colors = colors
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                if (upcomingList.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Upcoming",
+                            color = colors.textSecondary,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                    itemsIndexed(upcomingList) { index, upcoming ->
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = colors.cardBackgroundHigh
+                            ),
+                            shape = RoundedCornerShape(
+                                topStart = if (index == 0) 12.dp else 4.dp,
+                                topEnd = if (index == 0) 12.dp else 4.dp,
+                                bottomStart = if (index == upcomingList.lastIndex) 12.dp else 4.dp,
+                                bottomEnd = if (index == upcomingList.lastIndex) 12.dp else 4.dp
+                            )
+                        ) {
+                            Box(modifier = Modifier.padding(horizontal = 8.dp)) {
                                 ScheduleItem(
-                                    title = ongoing.subject,
-                                    time = "${formatTo12Hour(ongoing.startTime)} - ${
-                                        formatTo12Hour(ongoing.endTime)
+                                    title = upcoming.subject,
+                                    time = "${formatTo12Hour(upcoming.startTime)} - ${
+                                        formatTo12Hour(upcoming.endTime)
                                     }",
-                                    room = ongoing.room ?: "No Room",
+                                    room = upcoming.room ?: "No Room",
                                     colors = colors
                                 )
                             }
                         }
                     }
                 }
-            }
-            if (upcomingList.isNotEmpty()) {
-                item {
-                    Text(
-                        text = "Upcoming",
-                        color = colors.textSecondary,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                itemsIndexed(upcomingList) { index, upcoming ->
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = colors.cardBackgroundHigh
-                        ),
-                        shape = RoundedCornerShape(
-                            topStart = if (index == 0) 12.dp else 4.dp,
-                            topEnd = if (index == 0) 12.dp else 4.dp,
-                            bottomStart = if (index == upcomingList.lastIndex) 12.dp else 4.dp,
-                            bottomEnd = if (index == upcomingList.lastIndex) 12.dp else 4.dp
-                        )
-                    ) {
-                        Box(modifier = Modifier.padding(horizontal = 8.dp)) {
-                            ScheduleItem(
-                                title = upcoming.subject,
-                                time = "${formatTo12Hour(upcoming.startTime)} - ${
-                                    formatTo12Hour(upcoming.endTime)
-                                }",
-                                room = upcoming.room ?: "No Room",
-                                colors = colors
+                if (ongoing == null && upcomingList.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillParentMaxHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "No remaining class today",
+                                color = colors.textPrimary,
+                                fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.titleMediumEmphasized
                             )
+
                         }
                     }
                 }
-            }
-            if (ongoing == null && upcomingList.isEmpty()) {
+            }else{
                 item {
                     Box(
                         modifier = Modifier
