@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kito">
         <receiver
-            android:name=".notification.BootReceiver"
+            android:name=".feature.schedule.notification.BootReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
@@ -28,10 +28,10 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".notification.NotificationReceiver"
+            android:name=".feature.schedule.notification.NotificationReceiver"
             android:exported="false" />
         <receiver
-            android:name=".widget.TimeTableAppWidget"
+            android:name=".feature.schedule.widget.TimeTableAppWidget"
             android:exported="false">
 
             <intent-filter>
@@ -43,7 +43,7 @@
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.SystemTimeChangeReceiver"
+            android:name=".feature.schedule.widget.SystemTimeChangeReceiver"
             android:exported="false">
 
             <intent-filter>

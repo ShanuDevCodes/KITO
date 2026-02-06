@@ -28,10 +28,10 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.kito.data.local.preferences.PrefsRepository
-import com.kito.notification.NotificationPipelineController
-import com.kito.ui.newUi.MainUI
-import com.kito.ui.theme.KitoTheme
+import com.kito.core.datastore.PrefsRepository
+import com.kito.feature.schedule.notification.NotificationPipelineController
+import com.kito.feature.app.presentation.MainUI
+import com.kito.core.presentation.theme.KitoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -159,3 +159,5 @@ class MainActivity : ComponentActivity() {
         }.show()
     }
 }
+
+

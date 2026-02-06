@@ -11,9 +11,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.kito.data.local.preferences.PrefsRepository
-import com.kito.ui.newUi.screen.OnBoardingScreen
-import com.kito.ui.theme.KitoTheme
+import com.kito.core.datastore.PrefsRepository
+import com.kito.feature.auth.presentation.OnBoardingScreen
+import com.kito.core.presentation.theme.KitoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,3 +46,4 @@ class OnBoardingActivity : ComponentActivity() {
         }
     }
 }
+

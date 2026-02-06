@@ -1,8 +1,8 @@
 package com.kito
 
 import android.app.Application
-import com.kito.notification.createClassNotificationChannel
-//import com.kito.widget.scheduleDailyWidgetUpdate
+import com.kito.feature.schedule.notification.createClassNotificationChannel
+//import com.kito.feature.schedule.widget.scheduleDailyWidgetUpdate
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

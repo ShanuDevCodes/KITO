@@ -9,8 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.kito.ui.newUi.screen.UserSetupScreen
-import com.kito.ui.theme.KitoTheme
+import com.kito.feature.auth.presentation.UserSetupScreen
+import com.kito.core.presentation.theme.KitoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

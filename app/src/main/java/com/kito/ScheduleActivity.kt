@@ -7,8 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
-import com.kito.ui.newUi.screen.ScheduleScreen
-import com.kito.ui.theme.KitoTheme
+import com.kito.feature.schedule.presentation.ScheduleScreen
+import com.kito.core.presentation.theme.KitoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
