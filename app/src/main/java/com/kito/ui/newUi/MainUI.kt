@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -40,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
@@ -52,6 +55,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -105,6 +109,7 @@ fun MainUI(
     val snackbarHostState = remember { SnackbarHostState() }
     val activity = LocalContext.current as Activity
     val intent = activity.intent
+    val navigationBarType = rememberNavigationBarType()
     LaunchedEffect(intent) {
         val data = intent.data ?: return@LaunchedEffect
 
@@ -147,10 +152,7 @@ fun MainUI(
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(
-                            bottom = WindowInsets.navigationBars.asPaddingValues()
-                                .calculateBottomPadding()
-                        )
+                        .windowInsetsPadding(WindowInsets.safeDrawing)
                         .padding(vertical = 10.dp, horizontal = 64.dp)
                         .fillMaxWidth()
                         .height(64.dp)
@@ -253,124 +255,144 @@ fun MainUI(
             }
         }
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = RootDestination.Tabs,
-            modifier = Modifier.hazeSource(hazeState),
-            enterTransition = {
-                if (
-                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                ) {
-                    fadeIn(
-                        animationSpec = tween(
-                            durationMillis = 400,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }else {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                        animationSpec = tween(
-                            durationMillis = 600,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }
-            },
-            exitTransition = {
-                if (
-                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                ) {
-                    fadeOut(
-                        animationSpec = tween(
-                            durationMillis = 400,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }else{
-                    slideOutHorizontally(
-                        targetOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
-                        animationSpec = tween(
-                            durationMillis = 600,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }
-            },
-            popEnterTransition = {
-                if (
-                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                ) {
-                    fadeIn(
-                        animationSpec = tween(
-                            durationMillis = 400,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }else {
-                    slideInHorizontally(
-                        initialOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
-                        animationSpec = tween(
-                            durationMillis = 300,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }
-            },
-            popExitTransition = {
-                if (
-                    initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                ) {
-                    fadeOut(
-                        animationSpec = tween(
-                            durationMillis = 400,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }else {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                        animationSpec = tween(
-                            durationMillis = 300,
-                            easing = ExpressiveEasing.Emphasized
-                        )
-                    )
-                }
-            }
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            navigation<RootDestination.Tabs>(
-                startDestination = TabDestination.Home,
+            NavHost(
+                navController = navController,
+                startDestination = RootDestination.Tabs,
+                modifier = Modifier.hazeSource(hazeState),
+                enterTransition = {
+                    if (
+                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                    ) {
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis = 400,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    } else {
+                        slideIntoContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(
+                                durationMillis = 600,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    }
+                },
+                exitTransition = {
+                    if (
+                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                    ) {
+                        fadeOut(
+                            animationSpec = tween(
+                                durationMillis = 400,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    } else {
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                            animationSpec = tween(
+                                durationMillis = 600,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    }
+                },
+                popEnterTransition = {
+                    if (
+                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                    ) {
+                        fadeIn(
+                            animationSpec = tween(
+                                durationMillis = 400,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    } else {
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                            animationSpec = tween(
+                                durationMillis = 300,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    }
+                },
+                popExitTransition = {
+                    if (
+                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
+                    ) {
+                        fadeOut(
+                            animationSpec = tween(
+                                durationMillis = 400,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    } else {
+                        slideOutOfContainer(
+                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(
+                                durationMillis = 300,
+                                easing = ExpressiveEasing.Emphasized
+                            )
+                        )
+                    }
+                }
             ) {
-                composable<TabDestination.Home> {
-                    HomeScreen(
-                        navController = navController
+                navigation<RootDestination.Tabs>(
+                    startDestination = TabDestination.Home,
+                ) {
+                    composable<TabDestination.Home> {
+                        HomeScreen(
+                            navController = navController
+                        )
+                    }
+                    composable<TabDestination.Attendance> {
+                        AttendanceListScreen()
+                    }
+                    composable<TabDestination.Faculty> {
+                        FacultyScreen(navController)
+                    }
+                    composable<TabDestination.Profile> {
+                        SettingsScreen(
+                            navController = navController,
+                            snackbarHostState = snackbarHostState
+                        )
+                    }
+                }
+                composable<RootDestination.Schedule> {
+                    ScheduleScreen()
+                }
+                composable<RootDestination.FacultyDetail> { backStackEntry ->
+                    val args = backStackEntry.toRoute<RootDestination.FacultyDetail>()
+                    val facultyId = args.facultyId
+                    FacultyDetailScreen(
+                        facultyId = facultyId
                     )
                 }
-                composable<TabDestination.Attendance> {
-                    AttendanceListScreen()
-                }
-                composable<TabDestination.Faculty> {
-                    FacultyScreen(navController)
-                }
-                composable<TabDestination.Profile> {
-                    SettingsScreen(
-                        navController = navController,
-                        snackbarHostState = snackbarHostState
-                    )
+                composable<RootDestination.ExamSchedule> {
+                    UpcomingExamScreen()
                 }
             }
-            composable<RootDestination.Schedule> {
-                ScheduleScreen()
-            }
-            composable<RootDestination.FacultyDetail> { backStackEntry ->
-                val args = backStackEntry.toRoute<RootDestination.FacultyDetail>()
-                val facultyId = args.facultyId
-                FacultyDetailScreen(
-                    facultyId = facultyId
+            if (navigationBarType == NavigationBarType.ThreeButton) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(
+                            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                        )
+                        .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
+                            blurRadius = 15.dp
+                            noiseFactor = 0.05f
+                            inputScale = HazeInputScale.Auto
+                            alpha = 0.98f
+                        }
                 )
-            }
-            composable<RootDestination.ExamSchedule> {
-                UpcomingExamScreen()
             }
         }
     }
@@ -378,3 +400,19 @@ fun MainUI(
 
 private fun NavDestination.isInTabs(): Boolean =
     hierarchy.any { it.hasRoute<RootDestination.Tabs>() }
+
+@Composable
+fun rememberNavigationBarType(): NavigationBarType {
+    val density = LocalDensity.current
+    val bottomInset = WindowInsets.navigationBars.getBottom(density)
+
+    return if (bottomInset > with(density) { 24.dp.roundToPx() })
+        NavigationBarType.ThreeButton
+    else
+        NavigationBarType.Gesture
+}
+
+enum class NavigationBarType {
+    Gesture,
+    ThreeButton
+}

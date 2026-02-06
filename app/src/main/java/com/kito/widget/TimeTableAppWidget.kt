@@ -4,10 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import java.util.concurrent.TimeUnit
 
 class TimeTableAppWidget : GlanceAppWidgetReceiver() {
 
