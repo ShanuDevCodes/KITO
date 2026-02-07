@@ -47,19 +47,6 @@ fun KitoTheme(
         else -> LightColorScheme
     }
 
-    val systemUiController = rememberSystemUiController()
-
-    SideEffect {
-        systemUiController.setStatusBarColor(
-            color = Color.Transparent,
-            darkIcons = false
-        )
-        systemUiController.setNavigationBarColor(
-            color = Color.Transparent,
-            darkIcons = false
-        )
-    }
-
     MaterialTheme(
         colorScheme = colorScheme,
         typography = androidx.compose.material3.Typography(),
