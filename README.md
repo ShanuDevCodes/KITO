@@ -141,4 +141,4 @@ The software is provided "AS IS", without warranty of any kind.
 
 ---
 
-> **Disclaimer**: Kito is an independent project and is not officially affiliated with KIIT University. It acts as a client-side interface for the student portal.
+> **Disclaimer**: Kito is an official application affiliated with ELABS and the School of Electronics.
