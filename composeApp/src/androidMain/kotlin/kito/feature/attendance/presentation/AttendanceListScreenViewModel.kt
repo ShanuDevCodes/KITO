@@ -1,15 +1,5 @@
 package com.kito.feature.attendance.presentation
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.kito.core.common.connectivity.ConnectivityObserver
-import com.kito.core.database.entity.AttendanceEntity
-import com.kito.core.database.repository.AttendanceRepository
-import com.kito.core.datastore.PrefsRepository
-import com.kito.core.datastore.SecurePrefs
-import com.kito.core.presentation.components.AppSyncUseCase
-import com.kito.core.presentation.components.state.SyncUiState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,10 +10,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AttendanceListScreenViewModel @Inject constructor(
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kito.core.common.connectivity.ConnectivityObserver
+import com.kito.core.database.entity.AttendanceEntity
+import com.kito.core.database.repository.AttendanceRepository
+import com.kito.core.datastore.PrefsRepository
+import com.kito.core.datastore.SecurePrefs
+import com.kito.core.presentation.components.AppSyncUseCase
+import com.kito.core.presentation.components.state.SyncUiState
+class AttendanceListScreenViewModel(
     private val attendanceRepository: AttendanceRepository,
     private val prefs: PrefsRepository,
     private val securePrefs: SecurePrefs,

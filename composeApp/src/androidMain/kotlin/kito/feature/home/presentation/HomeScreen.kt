@@ -55,7 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.glance.appwidget.updateAll
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -90,7 +90,7 @@ import java.time.LocalDate
 )
 @Composable
 fun HomeScreen(
-    viewmodel: HomeViewModel = hiltViewModel(),
+    viewmodel: HomeViewModel = koinViewModel(),
     navController: NavHostController
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }

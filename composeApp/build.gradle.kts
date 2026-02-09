@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    id("com.google.dagger.hilt.android")
+
     id("com.google.devtools.ksp")
 }
 
@@ -73,11 +73,9 @@ kotlin {
             implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
 
             //Dagger - Hilt
-            implementation(libs.hilt.android)
-            implementation(libs.androidx.work.runtime.ktx)
-            
-            implementation(libs.androidx.hilt.navigation.compose)
 
+
+            implementation(libs.androidx.work.runtime.ktx)
             //Lottie Animation
             implementation("com.airbnb.android:lottie-compose:6.6.7")
 
@@ -122,6 +120,10 @@ kotlin {
             // KMP Compose Android dependencies
              implementation(libs.compose.mp.uiToolingPreview) // Android specific preview
              implementation("androidx.activity:activity-compose:1.8.0")
+
+            //koin
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         
         commonMain.dependencies {
@@ -142,6 +144,13 @@ kotlin {
             
             // Ksoup (KMP HTML/XML Parser - Jsoup port)
             implementation(libs.ksoup)
+
+            // Koin
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.lifecycle.viewmodel)
+            implementation(libs.koin.navigation.compose)
         }
         
         commonTest.dependencies {
@@ -151,7 +160,6 @@ kotlin {
 }
 
 dependencies {
-    add("kspAndroid", libs.hilt.android.compiler)
     add("kspAndroid", "androidx.room:room-compiler:2.7.0")
 
     testImplementation(libs.junit)
@@ -176,7 +184,7 @@ android {
 
     defaultConfig {
         applicationId = "com.kito"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 19
         versionName = "3.1.0"

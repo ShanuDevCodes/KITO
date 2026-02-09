@@ -1,10 +1,6 @@
 package com.kito.core.presentation.components
 
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class StartupSyncGuard @Inject constructor(){
+class StartupSyncGuard {
     var hasSynced: Boolean = false
 }
 

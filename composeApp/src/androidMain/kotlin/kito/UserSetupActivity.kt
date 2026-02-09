@@ -12,9 +12,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.kito.core.presentation.theme.KitoTheme
 import com.kito.feature.auth.presentation.UserSetupScreen
-import dagger.hilt.android.AndroidEntryPoint
-
-@AndroidEntryPoint
 class UserSetupActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

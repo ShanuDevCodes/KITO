@@ -32,16 +32,13 @@ import com.kito.core.datastore.PrefsRepository
 import com.kito.core.presentation.theme.KitoTheme
 import com.kito.feature.app.presentation.MainUI
 import com.kito.feature.schedule.notification.NotificationPipelineController
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var prefs: PrefsRepository
+    private val prefs: PrefsRepository by inject()
     private val notificationPipelineController by lazy {
         NotificationPipelineController.get(applicationContext)
     }
@@ -67,7 +64,6 @@ class MainActivity : ComponentActivity() {
         checkForUpdate()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)

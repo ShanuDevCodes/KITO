@@ -1,21 +1,18 @@
 package com.kito.feature.schedule.presentation
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.kito.core.database.entity.StudentSectionEntity
-import com.kito.core.database.repository.StudentSectionRepository
-import com.kito.core.datastore.PrefsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
 
-@HiltViewModel
-class ScheduleScreenViewModel @Inject constructor(
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kito.core.database.entity.StudentSectionEntity
+import com.kito.core.database.repository.StudentSectionRepository
+import com.kito.core.datastore.PrefsRepository
+class ScheduleScreenViewModel(
     private val prefs: PrefsRepository,
     private val studentSectionRepository: StudentSectionRepository
 ): ViewModel() {

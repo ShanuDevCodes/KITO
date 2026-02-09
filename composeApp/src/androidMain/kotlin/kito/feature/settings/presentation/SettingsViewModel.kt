@@ -8,9 +8,6 @@ import com.kito.core.datastore.PrefsRepository
 import com.kito.core.datastore.SecurePrefs
 import com.kito.core.presentation.components.AppSyncUseCase
 import com.kito.core.presentation.components.state.SyncUiState
-import com.kito.feature.schedule.notification.NotificationPipelineController
-import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,9 +17,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-@HiltViewModel
-class SettingsViewModel @Inject constructor(
+import com.kito.feature.schedule.notification.NotificationPipelineController
+class SettingsViewModel(
     private val prefs: PrefsRepository,
     private val securePrefs: SecurePrefs,
     private val attendanceRepository: AttendanceRepository,

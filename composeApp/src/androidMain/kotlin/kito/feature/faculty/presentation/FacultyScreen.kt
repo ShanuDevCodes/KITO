@@ -73,7 +73,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.navigation.NavHostController
 import com.kito.core.presentation.components.FacultyCardContent
 import com.kito.core.presentation.components.FacultyCardShimmer
@@ -102,7 +102,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FacultyScreen(
     navController: NavHostController,
-    viewModel: FacultyScreenViewModel = hiltViewModel()
+    viewModel: FacultyScreenViewModel = koinViewModel()
 ) {
     val facultyList by viewModel.faculty.collectAsState()
     val searchResultState by viewModel.searchResultState.collectAsState()

@@ -1,16 +1,13 @@
 package com.kito.feature.app.presentation
 
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kito.core.database.repository.SectionRepository
 import com.kito.core.datastore.PrefsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-@HiltViewModel
-class AppViewModel @Inject constructor(
+class AppViewModel(
     private val pref: PrefsRepository,
     private val sectionRepository: SectionRepository
 ): ViewModel() {

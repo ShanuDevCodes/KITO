@@ -7,11 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class PrefsRepository @Inject constructor(
+class PrefsRepository(
     private val dataStore: DataStore<Preferences>
 ) {
     companion object {

@@ -1,5 +1,13 @@
 package com.kito.feature.exam.presentation
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -9,19 +17,8 @@ import com.kito.core.datastore.PrefsRepository
 import com.kito.core.network.supabase.SupabaseRepository
 import com.kito.core.network.supabase.model.MidsemScheduleModel
 import com.kito.core.presentation.components.state.SyncUiState
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import javax.inject.Inject
-
 @RequiresApi(Build.VERSION_CODES.O)
-@HiltViewModel
-class UpcomingExamViewModel @Inject constructor(
+class UpcomingExamViewModel(
     private val prefs: PrefsRepository,
     private val supabaseRepository: SupabaseRepository
 ): ViewModel() {

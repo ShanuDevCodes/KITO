@@ -2,11 +2,7 @@ package com.kito.core.database.repository
 
 import com.kito.core.database.dao.SectionDAO
 import com.kito.core.database.entity.SectionEntity
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class SectionRepository @Inject constructor(
+class SectionRepository(
     private val sectionDao: SectionDAO
 ) {
     suspend fun insertSection(sectionEntity: List<SectionEntity>) =

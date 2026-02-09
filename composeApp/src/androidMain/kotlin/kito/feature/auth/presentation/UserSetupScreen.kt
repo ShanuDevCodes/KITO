@@ -49,7 +49,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.kito.MainActivity
 import com.kito.R
 import com.kito.UserSetupActivity
@@ -59,7 +59,7 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun UserSetupScreen(
-    userSetupViewModel: UserSetupViewModel = hiltViewModel()
+    userSetupViewModel: UserSetupViewModel = koinViewModel()
 ) {
 //    val years = (currentYear - 5..currentYear).map { it.toString() }.reversed()
 //    val terms = listOf(

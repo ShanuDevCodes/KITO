@@ -1,5 +1,9 @@
 package com.kito.feature.faculty.presentation
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kito.core.common.connectivity.ConnectivityObserver
@@ -8,14 +12,7 @@ import com.kito.core.network.supabase.model.TeacherFuzzySearchModel
 import com.kito.core.network.supabase.model.TeacherModel
 import com.kito.core.presentation.components.state.SearchResultState
 import com.kito.core.presentation.components.state.SyncUiState
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-@HiltViewModel
-class FacultyScreenViewModel @Inject constructor(
+class FacultyScreenViewModel(
     private val repository: SupabaseRepository,
     private val connectivityObserver: ConnectivityObserver
 ) : ViewModel() {

@@ -80,7 +80,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.glance.appwidget.updateAll
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.kito.core.database.entity.AttendanceEntity
 import com.kito.core.database.entity.toAttendanceEntity
 import com.kito.core.presentation.components.AttendanceCard
@@ -109,7 +109,7 @@ import kotlin.math.roundToInt
 )
 @Composable
 fun AttendanceListScreen(
-    viewModel: AttendanceListScreenViewModel = hiltViewModel(),
+    viewModel: AttendanceListScreenViewModel = koinViewModel(),
 ) {
     val cardHaze = rememberHazeState()
     val uiColors = UIColors()

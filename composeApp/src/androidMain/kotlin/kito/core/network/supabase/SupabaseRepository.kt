@@ -9,9 +9,7 @@ import com.kito.core.network.supabase.model.TeacherScheduleByIDModel
 import com.kito.core.network.supabase.request.MidsemScheduleRequest
 import com.kito.core.network.supabase.request.TeacherScheduleByIDRequest
 import com.kito.core.network.supabase.request.TeacherSearchRequest
-import javax.inject.Inject
-
-class SupabaseRepository @Inject constructor(
+class SupabaseRepository(
     private val api: SupabaseApi
 ) {
 

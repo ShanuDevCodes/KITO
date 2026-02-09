@@ -1,8 +1,6 @@
 package com.kito.sap
 
-import javax.inject.Inject
-
-class SapRepository @Inject constructor() {
+class SapRepository {
     private val sapClient = SapPortalClient()
 
     suspend fun login(

@@ -73,7 +73,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.presentation.components.ExpressiveEasing
 import com.kito.core.presentation.components.UIColors
@@ -102,7 +102,7 @@ import kotlin.random.Random
 )
 @Composable
 fun ScheduleScreen(
-    viewModel: ScheduleScreenViewModel = hiltViewModel(),
+    viewModel: ScheduleScreenViewModel = koinViewModel(),
 ) {
     val today = todayKey()
     val currentPage = when (today) {

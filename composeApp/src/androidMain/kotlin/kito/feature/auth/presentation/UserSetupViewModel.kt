@@ -1,18 +1,15 @@
 package com.kito.feature.auth.presentation
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.datastore.SecurePrefs
 import com.kito.core.presentation.components.AppSyncUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-@HiltViewModel
-class UserSetupViewModel @Inject constructor(
+class UserSetupViewModel(
     private val prefs: PrefsRepository,
     private val securePrefs: SecurePrefs,
     private val appSyncUseCase: AppSyncUseCase

@@ -13,16 +13,13 @@ import com.kito.feature.schedule.notification.NotificationPipelineController
 import com.kito.feature.schedule.widget.WidgetUpdater.nudgeRedraw
 import com.kito.sap.AttendanceResult
 import com.kito.sap.SapRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.supervisorScope
-import javax.inject.Inject
-
-class AppSyncUseCase @Inject constructor(
-    @ApplicationContext private val context: Context,
+class AppSyncUseCase(
+    private val context: Context,
     private val supabaseRepository: SupabaseRepository,
     private val studentRepository: StudentRepository,
     private val sectionRepository: SectionRepository,

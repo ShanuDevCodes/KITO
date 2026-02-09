@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.examDateFormatter
@@ -65,7 +65,7 @@ import kotlin.random.Random
 )
 @Composable
 fun UpcomingExamScreen(
-    viewModel: UpcomingExamViewModel = hiltViewModel()
+    viewModel: UpcomingExamViewModel = koinViewModel()
 ) {
     val uiColors = UIColors()
     val hazeState = rememberHazeState()

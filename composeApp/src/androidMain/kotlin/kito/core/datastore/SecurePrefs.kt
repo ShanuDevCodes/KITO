@@ -4,18 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import dagger.hilt.android.qualifiers.ApplicationContext
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
-
-@Singleton
-class SecurePrefs @Inject constructor(
-    @ApplicationContext context: Context
+class SecurePrefs(
+    context: Context
 ) {
     private companion object {
         const val KEY_SAP_PASSWORD = "sap_password"

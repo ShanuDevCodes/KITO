@@ -9,9 +9,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
 import com.kito.core.presentation.theme.KitoTheme
 import com.kito.feature.schedule.presentation.ScheduleScreen
-import dagger.hilt.android.AndroidEntryPoint
-
-@AndroidEntryPoint
 class ScheduleActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {

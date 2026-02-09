@@ -15,13 +15,10 @@ import androidx.compose.ui.graphics.Color
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.presentation.theme.KitoTheme
 import com.kito.feature.auth.presentation.OnBoardingScreen
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class OnBoardingActivity : ComponentActivity() {
-    @Inject
-    lateinit var prefs: PrefsRepository
+    private val prefs: PrefsRepository by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
