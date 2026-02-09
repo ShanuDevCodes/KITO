@@ -15,6 +15,6 @@ class StudentRepository @Inject constructor(
     suspend fun deleteStudent(studentEntity: StudentEntity) =
         studentDao.deleteStudent(studentEntity)
 
-    suspend fun getStudentByRoll(rollNo: String): StudentEntity =
+    suspend fun getStudentByRoll(rollNo: String): StudentEntity? =
         studentDao.getStudentByRoll(rollNo)
 }

@@ -16,6 +16,6 @@ interface StudentDAO {
     suspend fun deleteStudent(studentEntity: StudentEntity)
 
     @Query("SELECT * FROM studententity WHERE roll_no = :rollNo")
-    suspend fun getStudentByRoll(rollNo: String): StudentEntity
+    suspend fun getStudentByRoll(rollNo: String): StudentEntity?
 
 }

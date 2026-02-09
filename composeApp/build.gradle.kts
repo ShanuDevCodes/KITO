@@ -97,9 +97,9 @@ kotlin {
             implementation("androidx.core:core-splashscreen:1.0.1")
 
             // Room (Database)
-            implementation("androidx.room:room-runtime:2.6.1")
-            implementation("androidx.room:room-ktx:2.6.1")
-            implementation("androidx.room:room-paging:2.6.1")
+            implementation("androidx.room:room-runtime:2.7.0")
+            implementation("androidx.room:room-ktx:2.7.0")
+            implementation("androidx.room:room-paging:2.7.0")
 
             //retrofit
             implementation("com.squareup.retrofit2:retrofit:2.11.0")
@@ -140,12 +140,21 @@ kotlin {
 
 dependencies {
     add("kspAndroid", libs.hilt.android.compiler)
-    add("kspAndroid", "androidx.room:room-compiler:2.6.1")
+    add("kspAndroid", "androidx.room:room-compiler:2.7.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     debugImplementation(libs.composeUiTooling)
+}
+
+// Force Kotlin metadata library version for Dagger/Hilt compatibility with Kotlin 2.3.0
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin" && requested.name == "kotlin-metadata-jvm") {
+            useVersion("2.3.0")
+        }
+    }
 }
 
 android {
