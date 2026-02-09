@@ -49,6 +49,9 @@ kotlin {
             implementation("com.squareup.okhttp3:okhttp:4.12.0")
             implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
             implementation("org.jsoup:jsoup:1.17.2")
+            
+            // Ktor engine for Android
+            implementation(libs.ktor.client.okhttp)
 
             // Compose dependencies for modern UI (Android specific if not yet moved to common)
             implementation(project.dependencies.platform(libs.compose.bom))
@@ -130,6 +133,15 @@ kotlin {
             implementation(libs.compose.mp.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            
+            // Ktor (KMP HTTP Client)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            
+            // Ksoup (KMP HTML/XML Parser - Jsoup port)
+            implementation(libs.ksoup)
         }
         
         commonTest.dependencies {
