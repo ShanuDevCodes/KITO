@@ -1,6 +1,5 @@
 package com.kito.feature.auth.presentation
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -43,22 +42,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
-import com.kito.MainActivity
 import com.kito.R
-import com.kito.UserSetupActivity
 import com.kito.core.presentation.components.UIColors
-import java.util.Calendar
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun UserSetupScreen(
+    onSetupComplete: () -> Unit,
     userSetupViewModel: UserSetupViewModel = koinViewModel()
 ) {
 //    val years = (currentYear - 5..currentYear).map { it.toString() }.reversed()
@@ -67,13 +66,12 @@ fun UserSetupScreen(
 //        "Spring"
 //    )
 //    var selectedTerm by rememberSaveable { mutableStateOf("Autumn") }
-    val context = LocalContext.current
     var name by rememberSaveable { mutableStateOf("") }
     var kiitRollNumber by rememberSaveable { mutableStateOf("") }
     var sapPassword by rememberSaveable { mutableStateOf("")}
-    val calendar = Calendar.getInstance()
-    val currentYear = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH) + 1
+    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentYear = now.year
+    val month = now.monthNumber
     val derivedYear = if (month < 5) {
         currentYear - 1
     } else {
@@ -102,8 +100,7 @@ fun UserSetupScreen(
     )
     LaunchedEffect(setupState) {
         if (setupState is SetupState.Success) {
-            context.startActivity(Intent(context, MainActivity::class.java))
-            (context as? UserSetupActivity)?.finish()
+            onSetupComplete()
         }
     }
 

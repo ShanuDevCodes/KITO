@@ -9,9 +9,9 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
-import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
@@ -32,13 +32,13 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.kito.ScheduleActivity
 import com.kito.core.datastore.ProtoDataStoreDTO
 import com.kito.core.datastore.StudentSectionDatastore
 import java.util.Calendar
 
 class TimetableWidget : GlanceAppWidget() {
     override val stateDefinition = TimetableGlanceStateDefinition
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             Log.d("Widget", "provideContend Called")
@@ -87,7 +87,7 @@ class TimetableWidget : GlanceAppWidget() {
                     .background(bgTop)
                     .cornerRadius(24.dp)
                     .padding(12.dp)
-                    .clickable(actionStartActivity<ScheduleActivity>()) // Redirect to schedule screen
+                    .clickable(actionRunCallback<OpenScheduleAction>())
             ) {
                 Column(modifier = GlanceModifier.fillMaxSize()) {
                     Row(
@@ -205,7 +205,7 @@ class TimetableWidget : GlanceAppWidget() {
             Row(
                 modifier = GlanceModifier
                     .fillMaxWidth()
-                    .clickable(actionStartActivity<ScheduleActivity>())
+                    .clickable(actionRunCallback<OpenScheduleAction>())
                     .background(cardBg)
                     .cornerRadius(16.dp)
                     .padding(12.dp),
@@ -300,4 +300,3 @@ class TimetableWidget : GlanceAppWidget() {
         }.timeInMillis
     }
 }
-

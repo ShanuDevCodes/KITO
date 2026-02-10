@@ -7,6 +7,12 @@ import kotlinx.serialization.Serializable
 sealed interface RootDestination {
 
     @Serializable
+    object Onboarding : RootDestination
+
+    @Serializable
+    object UserSetup : RootDestination
+
+    @Serializable
     object Tabs : RootDestination
 
     @Serializable

@@ -1,6 +1,5 @@
 package com.kito.feature.auth.presentation
 
-import android.content.Intent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -49,13 +48,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kito.OnBoardingActivity
 import com.kito.R
-import com.kito.UserSetupActivity
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.presentation.components.UIColors
 import kotlinx.coroutines.delay
@@ -63,9 +59,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun OnBoardingScreen(prefRepository: PrefsRepository) {
+fun OnBoardingScreen(prefRepository: PrefsRepository, onOnboardingComplete: () -> Unit) {
     val uiColor = UIColors()
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = {3}, initialPage = 0)
     val fabScale by animateFloatAsState(
@@ -324,10 +319,7 @@ fun OnBoardingScreen(prefRepository: PrefsRepository) {
                                     isLoading = true
                                     delay(500L)
                                     prefRepository.setOnboardingDone()
-                                    context.startActivity(
-                                        Intent(context, UserSetupActivity::class.java)
-                                    )
-                                    (context as? OnBoardingActivity)?.finish()
+                                    onOnboardingComplete()
                                 }
                             }
                         },
@@ -372,8 +364,7 @@ fun OnBoardingScreen(prefRepository: PrefsRepository) {
                 onClick = {
                     scope.launch {
                         prefRepository.setOnboardingDone()
-                        context.startActivity(Intent(context, UserSetupActivity::class.java))
-                        (context as? OnBoardingActivity)?.finish()
+                        onOnboardingComplete()
                     }
                 },
                 colors = ButtonDefaults.textButtonColors(
