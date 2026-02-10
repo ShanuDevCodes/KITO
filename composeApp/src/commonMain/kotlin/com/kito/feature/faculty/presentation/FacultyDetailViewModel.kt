@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kito.core.network.supabase.SupabaseRepository
@@ -38,10 +37,7 @@ class FacultyDetailViewModel(
                 _schedule.value = scheduleDeferred.await()
                 _syncState.value = SyncUiState.Success
             } catch (e: Exception) {
-                Log.d(
-                    "FacultyDetail",
-                    "FacultyDetailLoadingError: ${e.message ?: ""}"
-                )
+                println("FacultyDetail: FacultyDetailLoadingError: ${e.message ?: ""}")
                 _syncState.value = SyncUiState.Error(message = e.message?:"")
             }
         }

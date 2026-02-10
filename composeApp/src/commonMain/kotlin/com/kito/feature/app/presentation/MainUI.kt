@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -405,4 +404,9 @@ fun rememberNavigationBarType(): NavigationBarType {
 enum class NavigationBarType {
     Gesture,
     ThreeButton
+}
+
+inline fun <reified T : Any> NavDestination.hasRoute(): Boolean {
+    val serialName = kotlinx.serialization.serializer<T>().descriptor.serialName
+    return this.route?.split("/")?.get(0) == serialName
 }

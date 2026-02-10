@@ -1,7 +1,6 @@
 package com.kito.feature.faculty.presentation
 
-import android.annotation.SuppressLint
-import android.content.res.Configuration
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -15,6 +14,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -92,7 +92,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
-@SuppressLint("ConfigurationScreenWidthHeight")
+
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalHazeApi::class,
@@ -107,13 +107,14 @@ fun FacultyScreen(
     val facultyList by viewModel.faculty.collectAsState()
     val searchResultState by viewModel.searchResultState.collectAsState()
     val facultySearchResult by viewModel.facultySearchResult.collectAsState()
-    val uiColors = UIColors()
     val hazeState = rememberHazeState()
     val cardHaze = rememberHazeState()
-    val configuration = LocalConfiguration.current
-    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-    val screenWidthDp = configuration.screenWidthDp.dp
-    val textFieldState = rememberTextFieldState()
+    val uiColors = UIColors()
+    
+    BoxWithConstraints {
+        val screenWidthDp = maxWidth
+        val isPortrait = maxHeight > maxWidth
+        val textFieldState = rememberTextFieldState()
     val searchBarState = rememberSearchBarState()
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -571,6 +572,7 @@ fun FacultyScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+            }
     }
 }
 
