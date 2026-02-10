@@ -1,6 +1,8 @@
 package com.kito.feature.schedule.notification
 
 import com.kito.core.datastore.StudentSectionDatastore
+import kotlin.time.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.*
 
 fun computeNextClass(
@@ -17,9 +19,9 @@ fun computeNextClass(
 }
 
 fun classStartMillis(section: StudentSectionDatastore): Long {
-    val now = Clock.System.now()
+    val now = currentLocalDateTime()
     val timeZone = TimeZone.currentSystemDefault()
-    val today = now.toLocalDateTime(timeZone).date
+    val today = now.date
 
     val (hour, minute) = section.startTime
         .split(":")
@@ -44,7 +46,7 @@ fun classStartMillis(section: StudentSectionDatastore): Long {
     
     // If today is the day, check if time has passed
     if (daysDiff == 0) {
-         val nowTime = now.toLocalDateTime(timeZone).time
+         val nowTime = now.time
          if (classTime <= nowTime) {
              targetDate = targetDate.plus(7, DateTimeUnit.DAY)
          }

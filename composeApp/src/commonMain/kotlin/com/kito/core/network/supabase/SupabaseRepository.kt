@@ -10,7 +10,6 @@ import com.kito.core.network.supabase.model.TeacherScheduleByIDModel
 import com.kito.core.network.supabase.request.MidsemScheduleRequest
 import com.kito.core.network.supabase.request.TeacherScheduleByIDRequest
 import com.kito.core.network.supabase.request.TeacherSearchRequest
-
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

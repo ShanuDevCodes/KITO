@@ -84,7 +84,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.isoDayNumber
@@ -140,11 +140,11 @@ fun ScheduleScreen(
         }
     }
     var now by remember {
-        val dt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val dt = currentLocalDateTime()
         mutableStateOf(LocalTime(dt.hour, dt.minute, dt.second))
     }
     LaunchedEffect(Unit) {
-        val dt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val dt = currentLocalDateTime()
         now = LocalTime(dt.hour, dt.minute, dt.second)
     }
     LaunchedEffect(Unit) {
@@ -538,7 +538,7 @@ fun Modifier.horizontalCarouselTransition(page: Int, pagerState: PagerState) =
     }
 
 private fun todayKey(): String {
-    val dt = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val dt = currentLocalDateTime()
     return when (dt.dayOfWeek.isoDayNumber) {
         1 -> "MON"
         2 -> "TUE"

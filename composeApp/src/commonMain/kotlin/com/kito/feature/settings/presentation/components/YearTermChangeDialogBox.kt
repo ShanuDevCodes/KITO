@@ -48,7 +48,7 @@ import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -65,7 +65,7 @@ fun YearTermChangeDialogBox(
     hazeState: HazeState
 ) {
     val uiColors = UIColors()
-    val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
+    val currentYear = currentLocalDateTime().year
     val years = (currentYear - 5..currentYear).map { it.toString() }.reversed()
     val terms = listOf(
         "Autumn",

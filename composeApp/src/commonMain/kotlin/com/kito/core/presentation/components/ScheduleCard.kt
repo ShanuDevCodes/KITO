@@ -41,7 +41,7 @@ import com.kito.core.database.entity.StudentSectionEntity
 import com.kito.core.presentation.components.animation.PageNotFoundAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.isoDayNumber
@@ -59,8 +59,8 @@ fun ScheduleCard(
     val (ongoing, upcomingList) = remember(schedule, now) {
         findOngoingAndAllUpcoming(schedule, now)
     }
-    val todayDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    val today = when (todayDateTime.dayOfWeek.isoDayNumber) {
+    val currentDateTime = currentLocalDateTime()
+    val today = when (currentDateTime.dayOfWeek.isoDayNumber) {
         1 -> "MON"
         2 -> "TUE"
         3 -> "WED"
@@ -291,12 +291,12 @@ fun findOngoingAndAllUpcoming(
 
 @Composable
 fun rememberCurrentTime(): LocalTime {
-    val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentDateTime = currentLocalDateTime()
     var now by remember { mutableStateOf(LocalTime(currentDateTime.hour, currentDateTime.minute, currentDateTime.second)) }
 
     LaunchedEffect(Unit) {
         while (true) {
-            val current = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            val current = currentLocalDateTime()
             now = LocalTime(current.hour, current.minute, current.second)
 
             // ⏱ align to next minute boundary

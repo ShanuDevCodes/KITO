@@ -66,7 +66,7 @@ import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
 import com.kito.core.platform.toast
 import com.kito.core.platform.sendEmail
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.DayOfWeek
@@ -107,7 +107,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).dayOfWeek
+        val today = currentLocalDateTime().dayOfWeek
         val dayString = when (today) {
             DayOfWeek.MONDAY -> "MON"
             DayOfWeek.TUESDAY -> "TUE"

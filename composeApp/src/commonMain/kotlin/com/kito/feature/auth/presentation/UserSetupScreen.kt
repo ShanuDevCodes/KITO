@@ -52,7 +52,7 @@ import org.jetbrains.compose.resources.painterResource
 import kito.composeapp.generated.resources.Res
 import kito.composeapp.generated.resources.e_labs_logo
 import com.kito.core.presentation.components.UIColors
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -71,7 +71,7 @@ fun UserSetupScreen(
     var name by rememberSaveable { mutableStateOf("") }
     var kiitRollNumber by rememberSaveable { mutableStateOf("") }
     var sapPassword by rememberSaveable { mutableStateOf("")}
-    val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val now = currentLocalDateTime()
     val currentYear = now.year
     val month = now.monthNumber
     val derivedYear = if (month < 5) {

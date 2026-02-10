@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -212,7 +212,7 @@ class HomeViewModel (
         exams: List<MidsemScheduleModel>
     ): MidsemScheduleModel? {
 
-        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val now = currentLocalDateTime()
         val nowDate = now.date
         val nowTime = now.time
 

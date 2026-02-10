@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -51,7 +51,7 @@ class UpcomingExamViewModel(
         exams: List<MidsemScheduleModel>
     ): List<MidsemScheduleModel> {
 
-        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val now = currentLocalDateTime()
         val nowDate = now.date
         val nowTime = now.time
 
