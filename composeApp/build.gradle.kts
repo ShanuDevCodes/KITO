@@ -53,59 +53,35 @@ kotlin {
             // Ktor engine for Android
             implementation(libs.ktor.client.okhttp)
 
-            // Compose dependencies for modern UI (Android specific if not yet moved to common)
+            // Compose dependencies (Android specific)
             implementation(project.dependencies.platform(libs.compose.bom))
             implementation(libs.composeUi)
             implementation(libs.composeUiTooling)
             implementation(libs.composeUiGraphics)
             implementation(libs.compose.material3)
-            implementation(libs.androidx.activity)
             implementation("androidx.activity:activity-compose:1.8.0")
             implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-
-            // if using Compose BOM, keep versions aligned
             implementation("androidx.compose.material:material-icons-extended")
 
-            // DataStore for persistent preferences
-            implementation("androidx.datastore:datastore-preferences:1.2.0")
+            // DataStore (proto - Android only)
             implementation("androidx.datastore:datastore:1.2.0")
-            implementation(libs.androidx.navigation.compose)
-            implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
-
-            //Dagger - Hilt
-
 
             implementation(libs.androidx.work.runtime.ktx)
+
             //Lottie Animation
             implementation("com.airbnb.android:lottie-compose:6.6.7")
 
-            //HazeEffect(Frosted Glass)
-            implementation(libs.haze)
-            implementation(libs.haze.materials)
-
             //Glance
             implementation("androidx.glance:glance-appwidget:1.1.1")
-            // For interop APIs with Material 3
             implementation("androidx.glance:glance-material3:1.1.1")
-            // For interop APIs with Material 2
             implementation("androidx.glance:glance-material:1.1.1")
-
-            //composeNavigation
-            implementation(libs.navigation.compose)
-            implementation(libs.kotlinx.serialization.json)
 
             //splashScreen
             implementation("androidx.core:core-splashscreen:1.0.1")
 
-            // Room (Database)
-            implementation("androidx.room:room-runtime:2.7.0")
-            implementation("androidx.room:room-ktx:2.7.0")
-            implementation("androidx.room:room-paging:2.7.0")
-
             //retrofit
             implementation("com.squareup.retrofit2:retrofit:2.11.0")
             implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-            implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
             //EncryptedSharedPreferences
             implementation("androidx.security:security-crypto:1.1.0-alpha06")
@@ -118,8 +94,7 @@ kotlin {
             implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
             
             // KMP Compose Android dependencies
-             implementation(libs.compose.mp.uiToolingPreview) // Android specific preview
-             implementation("androidx.activity:activity-compose:1.8.0")
+            implementation(libs.compose.mp.uiToolingPreview)
 
             //koin
             implementation(libs.koin.android)
@@ -142,11 +117,31 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
             
-            // Ksoup (KMP HTML/XML Parser - Jsoup port)
+            // Ksoup (KMP HTML/XML Parser)
             implementation(libs.ksoup)
 
             // Kotlinx DateTime
             implementation(libs.kotlinx.datetime)
+
+            // DataStore Preferences KMP
+            implementation(libs.datastore.preferences.core)
+
+            // kotlinx-collections-immutable
+            implementation(libs.kotlinx.collections.immutable)
+
+            // kotlinx-serialization
+            implementation(libs.kotlinx.serialization.json)
+
+            // Haze (Frosted Glass)
+            implementation(libs.haze)
+            implementation(libs.haze.materials)
+
+            // Navigation Compose
+            implementation(libs.navigation.compose)
+
+            // Room KMP
+            implementation(libs.room.runtime)
+            implementation(libs.compottie)
 
 
             // Koin
@@ -156,6 +151,11 @@ kotlin {
             implementation(libs.lifecycle.viewmodel)
             implementation(libs.koin.navigation.compose)
         }
+
+        iosMain.dependencies {
+            // Ktor engine for iOS
+            implementation(libs.ktor.client.darwin)
+        }
         
         commonTest.dependencies {
              implementation(kotlin("test"))
@@ -164,7 +164,7 @@ kotlin {
 }
 
 dependencies {
-    add("kspAndroid", "androidx.room:room-compiler:2.7.0")
+    add("kspAndroid", libs.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

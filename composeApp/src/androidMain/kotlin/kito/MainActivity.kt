@@ -10,6 +10,9 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.DisposableEffect
+import androidx.core.util.Consumer
+import android.content.Intent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -85,12 +88,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appUpdateManager = AppUpdateManagerFactory.create(this)
-        setContent {
+            setContent {
             // Determine start destination while splash screen is visible
             var startDestination by remember { mutableStateOf<RootDestination?>(null) }
             var keepOnScreenCondition by remember { mutableStateOf(true) }
+            var deepLinkTarget by remember { mutableStateOf<String?>(null) }
 
             LaunchedEffect(Unit) {
+                val intent = intent
+                if (intent?.data?.scheme == "kito" && intent.data?.host == "schedule") {
+                    deepLinkTarget = "schedule"
+                    // Clear intent to avoid re-triggering on rotation/re-entry
+                    this@MainActivity.intent = Intent(this@MainActivity, MainActivity::class.java)
+                }
+
                 notificationPipelineController.sync()
                 val onboardingDone = prefs.onBoardingFlow.first()
                 val isUserSetupDone = prefs.userSetupDoneFlow.first()
@@ -101,6 +112,19 @@ class MainActivity : ComponentActivity() {
                 }
                 keepOnScreenCondition = false
             }
+
+            // Handle new intents (e.g., if activity is singleTop)
+            DisposableEffect(Unit) {
+                val listener = Consumer<Intent> { newIntent ->
+                     if (newIntent?.data?.scheme == "kito" && newIntent.data?.host == "schedule") {
+                        deepLinkTarget = "schedule"
+                        this@MainActivity.intent = Intent(this@MainActivity, MainActivity::class.java)
+                    }
+                }
+                addOnNewIntentListener(listener)
+                onDispose { removeOnNewIntentListener(listener) }
+            }
+
 
             splashScreen.setKeepOnScreenCondition { keepOnScreenCondition }
 
@@ -200,7 +224,10 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                             composable<RootDestination.Tabs> {
-                                MainUI()
+                                MainUI(
+                                    deepLinkTarget = deepLinkTarget,
+                                    onDeepLinkConsumed = { deepLinkTarget = null }
+                                )
                             }
                         }
                     }
