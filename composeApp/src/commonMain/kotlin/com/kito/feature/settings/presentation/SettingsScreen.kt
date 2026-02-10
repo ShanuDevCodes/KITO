@@ -20,8 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Login
-import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.Edit
@@ -219,7 +218,7 @@ fun SettingsScreen(
         SettingsItem(
             title = if (!isLoggedIn) "Login" else "Logout",
             value = if(!isLoggedIn) "Login to SAP" else "Logout of SAP",
-            icon = if (!isLoggedIn) Icons.AutoMirrored.Filled.Login else Icons.AutoMirrored.Filled.Logout,
+            icon = if (!isLoggedIn) Icons.Default.Person else Icons.Default.Lock,
             onClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
                 if (isLoggedIn){

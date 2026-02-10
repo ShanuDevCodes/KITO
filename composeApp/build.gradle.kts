@@ -45,31 +45,16 @@ kotlin {
             implementation(libs.androidx.activity)
             implementation(libs.androidx.constraintlayout)
 
-            // Dependencies for SAP portal integration
-            implementation("com.squareup.okhttp3:okhttp:4.12.0")
-            implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-            implementation("org.jsoup:jsoup:1.17.2")
-            
             // Ktor engine for Android
             implementation(libs.ktor.client.okhttp)
 
             // Compose dependencies (Android specific)
-            implementation(project.dependencies.platform(libs.compose.bom))
-            implementation(libs.composeUi)
-            implementation(libs.composeUiTooling)
-            implementation(libs.composeUiGraphics)
-            implementation(libs.compose.material3)
             implementation("androidx.activity:activity-compose:1.8.0")
-            implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-            implementation("androidx.compose.material:material-icons-extended")
 
             // DataStore (proto - Android only)
             implementation("androidx.datastore:datastore:1.2.0")
 
             implementation(libs.androidx.work.runtime.ktx)
-
-            //Lottie Animation
-            implementation("com.airbnb.android:lottie-compose:6.6.7")
 
             //Glance
             implementation("androidx.glance:glance-appwidget:1.1.1")
@@ -79,10 +64,6 @@ kotlin {
             //splashScreen
             implementation("androidx.core:core-splashscreen:1.0.1")
 
-            //retrofit
-            implementation("com.squareup.retrofit2:retrofit:2.11.0")
-            implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-
             //EncryptedSharedPreferences
             implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
@@ -90,15 +71,8 @@ kotlin {
             implementation("com.google.android.play:app-update:2.1.0")
             implementation("com.google.android.play:app-update-ktx:2.1.0")
 
-            //System UI Controller
-            implementation("com.google.accompanist:accompanist-systemuicontroller:0.34.0")
-            
-            // KMP Compose Android dependencies
-            implementation(libs.compose.mp.uiToolingPreview)
-
             //koin
             implementation(libs.koin.android)
-            implementation(libs.koin.androidx.compose)
         }
         
         commonMain.dependencies {
@@ -142,6 +116,9 @@ kotlin {
             // Room KMP
             implementation(libs.room.runtime)
             implementation(libs.compottie)
+            
+            // Icons (Explicit version to resolve build issue)
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.0")
 
 
             // Koin
