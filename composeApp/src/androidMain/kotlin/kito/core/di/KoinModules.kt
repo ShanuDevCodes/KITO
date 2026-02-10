@@ -15,8 +15,8 @@ import com.kito.core.database.repository.StudentSectionRepository
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.datastore.ProtoDatastoreRepository
 import com.kito.core.datastore.SecurePrefs
-import com.kito.core.network.supabase.SupabaseApi
-import com.kito.core.network.supabase.SupabaseAuthInterceptor
+
+
 import com.kito.core.network.supabase.SupabaseRepository
 import com.kito.core.presentation.components.AppSyncUseCase
 import com.kito.core.presentation.components.StartupSyncGuard
@@ -34,7 +34,14 @@ import com.kito.sap.SapRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import okhttp3.OkHttpClient
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.request.header
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -42,8 +49,6 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 private const val DATASTORE_NAME = "app_prefs"
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = DATASTORE_NAME)
@@ -67,22 +72,33 @@ val appModule = module {
     single { get<AppDB>().sectionDao() }
     single { get<AppDB>().studentSectionDao() }
     
-    // Network (Retrofit/OkHttp)
-    single {
-        OkHttpClient.Builder()
-            .addInterceptor(SupabaseAuthInterceptor())
-            .build()
-    }
     
+    // Ktor HttpClient for Supabase
     single {
-        Retrofit.Builder()
-            .baseUrl(BuildConfig.SUPABASE_URL)
-            .client(get())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    prettyPrint = true
+                    isLenient = true
+                })
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15000
+                connectTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
+            }
+            defaultRequest {
+                url(BuildConfig.SUPABASE_URL)
+                header("apikey", BuildConfig.SUPABASE_ANON_KEY)
+                header("Authorization", "Bearer ${BuildConfig.SUPABASE_ANON_KEY}")
+                header("Accept", "application/json")
+                header("Content-Type", "application/json")
+                header("Prefer", "return=representation")
+            }
+        }
     }
-    
-    single { get<Retrofit>().create(SupabaseApi::class.java) }
+
     
     // Coroutine Scope
     single(named("ApplicationScope")) { CoroutineScope(SupervisorJob() + Dispatchers.Default) }

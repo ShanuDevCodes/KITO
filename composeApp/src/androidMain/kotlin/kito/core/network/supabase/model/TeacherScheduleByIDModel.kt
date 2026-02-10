@@ -1,7 +1,9 @@
 package com.kito.core.network.supabase.model
 
+import kotlinx.serialization.Serializable
 import androidx.annotation.Keep
 
+@Serializable
 @Keep
 data class TeacherScheduleByIDModel(
     val batch: String? = null,

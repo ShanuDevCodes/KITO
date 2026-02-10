@@ -145,6 +145,10 @@ kotlin {
             // Ksoup (KMP HTML/XML Parser - Jsoup port)
             implementation(libs.ksoup)
 
+            // Kotlinx DateTime
+            implementation(libs.kotlinx.datetime)
+
+
             // Koin
             api(libs.koin.core)
             implementation(libs.koin.compose)

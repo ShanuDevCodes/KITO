@@ -13,13 +13,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kito.core.common.connectivity.ConnectivityObserver
@@ -34,6 +35,7 @@ import com.kito.core.network.supabase.model.MidsemScheduleModel
 import com.kito.core.presentation.components.AppSyncUseCase
 import com.kito.core.presentation.components.StartupSyncGuard
 import com.kito.core.presentation.components.state.SyncUiState
+
 class HomeViewModel (
     private val prefs: PrefsRepository,
     private val securePrefs: SecurePrefs,
@@ -193,7 +195,7 @@ class HomeViewModel (
     fun setLoginStateIdle(){
         _loginState.value = SyncUiState.Idle
     }
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun getExamSchedule(){
         viewModelScope.launch {
             try {
@@ -201,17 +203,18 @@ class HomeViewModel (
                 val examSchedule = supabaseRepository.getMidSemSchedule(roll)
                 _examModel.value = getNextOrOngoingExam(examSchedule)
             }catch (e: Exception){
-                Log.d("exam model error",e.message?:"")
+                println("exam model error: ${e.message}")
             }
         }
     }
-    @RequiresApi(Build.VERSION_CODES.O)
+
     fun getNextOrOngoingExam(
         exams: List<MidsemScheduleModel>
     ): MidsemScheduleModel? {
 
-        val nowDate = LocalDate.now()
-        val nowTime = LocalTime.now()
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val nowDate = now.date
+        val nowTime = now.time
 
         return exams
             .mapNotNull { exam ->
@@ -223,15 +226,15 @@ class HomeViewModel (
                     when {
                         // 🟢 Exam is ONGOING
                         examDate == nowDate &&
-                                !nowTime.isBefore(startTime) &&
-                                nowTime.isBefore(endTime) -> {
-                            exam to LocalDateTime.of(examDate, startTime)
+                                nowTime >= startTime &&
+                                nowTime < endTime -> {
+                            exam to LocalDateTime(examDate, startTime)
                         }
 
                         // 🔵 Exam is in the FUTURE
-                        examDate.isAfter(nowDate) ||
-                                (examDate == nowDate && startTime.isAfter(nowTime)) -> {
-                            exam to LocalDateTime.of(examDate, startTime)
+                        examDate > nowDate ||
+                                (examDate == nowDate && startTime > nowTime) -> {
+                            exam to LocalDateTime(examDate, startTime)
                         }
 
                         else -> null

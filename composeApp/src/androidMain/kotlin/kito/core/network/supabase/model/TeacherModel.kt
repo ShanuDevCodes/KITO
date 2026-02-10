@@ -1,7 +1,9 @@
 package com.kito.core.network.supabase.model
 
+import kotlinx.serialization.Serializable
 import androidx.annotation.Keep
 
+@Serializable
 @Keep
 data class TeacherModel(
     val email: String? = null,

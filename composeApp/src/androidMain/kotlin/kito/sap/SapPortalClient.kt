@@ -1,70 +1,69 @@
 package com.kito.sap
 
+import com.fleeksoft.ksoup.Ksoup
+import com.kito.BuildConfig
 import com.kito.sap.sensitive.SapPortalHeaders
 import com.kito.sap.sensitive.SapPortalHtmlParser
 import com.kito.sap.sensitive.SapPortalParams
 import com.kito.sap.sensitive.SapPortalTokenExtractor
 import com.kito.sap.sensitive.SapPortalUrls
-import com.fleeksoft.ksoup.Ksoup
-import com.kito.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
-import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRedirect
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.cookies.AcceptAllCookiesStorage
+import io.ktor.client.plugins.cookies.HttpCookies
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.headers
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Parameters
+import io.ktor.http.decodeURLPart
+import io.ktor.http.encodeURLQueryComponent
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class SapPortalClient {
 
-    private val cookieStorage = AcceptAllCookiesStorage()
-    
-    private val client = HttpClient(OkHttp) {
-        install(HttpCookies) {
-            storage = cookieStorage
-        }
-        install(HttpRedirect) {
-            checkHttpMethod = false // Keep the same method for redirects (needed for some poorly behaved servers, mirroring OkHttp aggression)
-        }
-        install(HttpTimeout) {
-            requestTimeoutMillis = 30000
-            connectTimeoutMillis = 30000
-            socketTimeoutMillis = 30000
-        }
-        install(DefaultRequest) {
-            header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36")
-            header("sec-ch-ua", "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"")
-            header("sec-ch-ua-mobile", "?0")
-            header("sec-ch-ua-platform", "\"Windows\"")
-            header("sec-fetch-dest", "document")
-            header("sec-fetch-mode", "navigate")
-            header("sec-fetch-site", "same-origin")
-            header("sec-fetch-user", "?1")
-            header("upgrade-insecure-requests", "1")
-            header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-            header("Accept-Language", "en-US,en;q=0.9")
-            header("Cache-Control", "no-cache")
-            header("Pragma", "no-cache")
-            header("DNT", "1")
+    private fun createClient(): HttpClient {
+        return HttpClient(OkHttp) {
+            install(HttpCookies) {
+                storage = AcceptAllCookiesStorage()
+            }
+            install(HttpRedirect) {
+                checkHttpMethod = false // Keep the same method for redirects (needed for some poorly behaved servers, mirroring OkHttp aggression)
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30000
+                connectTimeoutMillis = 30000
+                socketTimeoutMillis = 30000
+            }
+            install(DefaultRequest) {
+                header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36")
+                header("sec-ch-ua", "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"")
+                header("sec-ch-ua-mobile", "?0")
+                header("sec-ch-ua-platform", "\"Windows\"")
+                header("sec-fetch-dest", "document")
+                header("sec-fetch-mode", "navigate")
+                header("sec-fetch-site", "same-origin")
+                header("sec-fetch-user", "?1")
+                header("upgrade-insecure-requests", "1")
+                header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+                header("Accept-Language", "en-US,en;q=0.9")
+                header("Cache-Control", "no-cache")
+                header("Pragma", "no-cache")
+                header("DNT", "1")
+            }
         }
     }
 
     suspend fun fetchAttendance(username: String, password: String, academicYear: String = "", termCode: String = ""): AttendanceResult = withContext(Dispatchers.IO) {
-        // Clear cookies at start
-        cookieStorage.clear()
-
-        return@withContext try {
+        val client = createClient()
+        
+        try {
             // Step 1: Load login page
             val loginPageResponse = client.get(SapPortalUrls.getLoginPageUrl())
 
@@ -76,6 +75,7 @@ class SapPortalClient {
             val salt = SapPortalHtmlParser.extractSaltFromLoginPage(loginPageHtml)
 
             if (salt.isNullOrEmpty()) {
+                println("DEBUG: Failed to extract salt. HTML preview: ${loginPageHtml.take(500)}")
                 return@withContext AttendanceResult.Error("Could not extract j_salt from login page")
             }
 
@@ -212,7 +212,7 @@ class SapPortalClient {
             if (finalContextId == wdContextId) {
                 val urlContextIdMatch = Regex("""[?&]sap-contextid=([^&]+)""", RegexOption.IGNORE_CASE).find(responseUrl)
                 if (urlContextIdMatch != null && urlContextIdMatch.groupValues.size > 1) {
-                    val urlContextId = java.net.URLDecoder.decode(urlContextIdMatch.groupValues[1], "UTF-8")
+                    val urlContextId = urlContextIdMatch.groupValues[1].decodeURLPart()
                     if (urlContextId.isNotEmpty()) {
                         finalContextId = urlContextId
                     }
@@ -263,10 +263,12 @@ class SapPortalClient {
 
             val (academicYearValue, termCodeValue) = SapPortalHtmlParser.detectAcademicYearAndTerm(htmlToParse, academicYear, termCode)
 
+
+
             // Step 9: Request attendance with selection
             val attendanceBody = SapPortalParams.getAttendanceBodyWithSelection(secureId, academicYearValue, termCodeValue).toMutableMap()
 
-            val encodedExtSid = java.net.URLEncoder.encode(finalExtSid.replace("*", "*").replace("-", "--"), "UTF-8")
+            val encodedExtSid = finalExtSid.replace("*", "*").replace("-", "--").encodeURLQueryComponent()
             val sapeventQueue = attendanceBody["SAPEVENTQUEUE"]?.replace("PLACEHOLDER_EXT_SID", encodedExtSid) ?: ""
             attendanceBody["SAPEVENTQUEUE"] = sapeventQueue
 
@@ -293,34 +295,25 @@ class SapPortalClient {
             // Step 10: Parse attendance data
             val parsedAttendance = AttendanceData(SapPortalHtmlParser.parseAttendanceData(attendanceHtml))
 
-            performLogout()
+            performLogout(client)
 
             AttendanceResult.Success(parsedAttendance)
 
-        } catch (e: IOException) {
-            performLogout()
+        } catch (e: Exception) {
+            try { performLogout(client) } catch(e: Exception) {}
             e.printStackTrace()
             val errorMessage = if (e.message?.contains("Unable to resolve host") == true) {
                 val host = e.message?.substringAfter("Unable to resolve host ", "")?.substringBefore(":") ?: "unknown host"
                 "Network error: Unable to connect to $host. The portal URL may have changed. Please verify that the portal URL is correct. Common causes: ICT Cell has changed the server URL or there are network connectivity issues."
             } else {
-                "Network error: ${e.message ?: e.javaClass.simpleName}"
+                "Network error: ${e.message ?: e::class.simpleName}"
             }
             AttendanceResult.Error(errorMessage)
-        } catch (e: Exception) {
-            performLogout()
-            e.printStackTrace()
-            val errorMessage = if (e.message?.contains("No attendance rows parsed") == true) {
-                "No attendance data available for the selected year and session. Please check your year/session selection and try again."
-            } else if (e.message?.contains("Unable to resolve host") == true) {
-                val host = e.message?.substringAfter("Unable to resolve host ", "")?.substringBefore(":") ?: "unknown host"
-                "Network error: Unable to connect to $host. The portal URL may have changed. Please verify that the portal URL is correct. Common causes: ICT Cell has changed the server URL or there are network connectivity issues."
-            } else {
-                "Error: ${e.message ?: e.javaClass.simpleName}"
-            }
-            AttendanceResult.Error(errorMessage)
+        } finally {
+             client.close()
         }
     }
+
 
     private fun secureWipe(charArray: CharArray) {
         for (i in charArray.indices) {
@@ -328,7 +321,7 @@ class SapPortalClient {
         }
     }
 
-    private suspend fun performLogout() {
+    private suspend fun performLogout(client: HttpClient) {
         try {
             val logoutResponse = client.submitForm(
                 url = SapPortalUrls.getLogoutUrl(),
@@ -355,13 +348,6 @@ class SapPortalClient {
                 println("⚠️ Could not complete logout (portal server unreachable)")
             }
         }
-    }
-
-    // Clear cookies helper for AcceptAllCookiesStorage
-    private suspend fun AcceptAllCookiesStorage.clear() {
-        // AcceptAllCookiesStorage doesn't have a clear method, but it's fine
-        // because we create a new client for each request in practice
-        // For now, we just let the cookies expire naturally or recreate the client
     }
 }
 
