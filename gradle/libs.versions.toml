@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.2"
+agp = "9.0.0"
 kotlin = "2.3.0"
 compose-compiler = "1.5.10"
 compose-bom = "2025.12.00"
@@ -130,8 +130,10 @@ compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "comp
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+

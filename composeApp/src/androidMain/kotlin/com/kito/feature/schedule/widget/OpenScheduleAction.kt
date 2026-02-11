@@ -6,7 +6,6 @@ import androidx.core.net.toUri
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import com.kito.MainActivity
 
 class OpenScheduleAction : ActionCallback {
     override suspend fun onAction(
@@ -14,14 +13,17 @@ class OpenScheduleAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        val intent = Intent(
-            Intent.ACTION_VIEW,
-            "kito://schedule".toUri(),
-            context,
-            MainActivity::class.java
-        ).apply {
+        // Use the launcher intent from the package instead of a direct class reference
+        // to avoid a circular dependency between composeApp (library) and androidApp
+        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        val intent = launchIntent?.apply {
+            action = Intent.ACTION_VIEW
+            data = "kito://schedule".toUri()
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        } ?: Intent(Intent.ACTION_VIEW, "kito://schedule".toUri()).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         context.startActivity(intent)
     }
 }
+

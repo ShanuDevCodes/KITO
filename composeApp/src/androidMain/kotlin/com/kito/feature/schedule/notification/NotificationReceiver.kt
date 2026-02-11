@@ -11,8 +11,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
-import com.kito.MainActivity
-import com.kito.R
+import com.kito.shared.R
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.datastore.ProtoDataStoreProvider
 import com.kito.core.datastore.StudentSectionDatastore
@@ -82,12 +81,14 @@ class NotificationReceiver : BroadcastReceiver() {
         type: ClassNotificationType,
         cls: StudentSectionDatastore
     ) {
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            "kito://schedule".toUri(),
-            context,
-            MainActivity::class.java // your launcher activity
-        ).apply {
+        // Use the launcher intent from the package instead of a direct class reference
+        // to avoid a circular dependency between composeApp (library) and androidApp
+        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        val deepLinkIntent = launchIntent?.apply {
+            action = Intent.ACTION_VIEW
+            data = "kito://schedule".toUri()
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        } ?: Intent(Intent.ACTION_VIEW, "kito://schedule".toUri()).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 

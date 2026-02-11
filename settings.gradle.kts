@@ -27,3 +27,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "kito"
 include(":composeApp")
+include(":androidApp")
+

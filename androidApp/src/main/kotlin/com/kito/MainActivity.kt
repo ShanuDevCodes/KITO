@@ -44,6 +44,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.kito.core.datastore.PrefsRepository
+import com.kito.core.platform.AppConfig
 import com.kito.core.presentation.components.ExpressiveEasing
 import com.kito.core.presentation.navigation.RootDestination
 import com.kito.core.presentation.theme.KitoTheme
@@ -88,6 +89,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         appUpdateManager = AppUpdateManagerFactory.create(this)
+
+        // Initialize AppConfig with BuildConfig values
+        AppConfig.init(
+            portalBase = BuildConfig.PORTAL_BASE,
+            wdPath = BuildConfig.WD_PATH,
+            supabaseUrl = BuildConfig.SUPABASE_URL,
+            supabaseAnonKey = BuildConfig.SUPABASE_ANON_KEY
+        )
+
             setContent {
             // Determine start destination while splash screen is visible
             var startDestination by remember { mutableStateOf<RootDestination?>(null) }
