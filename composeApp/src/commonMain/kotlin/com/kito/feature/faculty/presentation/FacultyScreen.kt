@@ -1,7 +1,5 @@
 package com.kito.feature.faculty.presentation
 
-
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -64,24 +62,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+//import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
-import androidx.navigation.NavHostController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.kito.core.presentation.components.FacultyCardContent
 import com.kito.core.presentation.components.FacultyCardShimmer
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.animation.NoInternetAnimation
 import com.kito.core.presentation.components.state.SearchResultState
 import com.kito.core.presentation.components.state.SyncUiState
-import com.kito.core.presentation.navigation.RootDestination
+import com.kito.core.presentation.navigation3.Routes
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -97,11 +97,11 @@ import kotlinx.coroutines.launch
     ExperimentalMaterial3Api::class,
     ExperimentalHazeApi::class,
     ExperimentalHazeMaterialsApi::class, ExperimentalMaterial3ExpressiveApi::class,
-    FlowPreview::class
+    FlowPreview::class, ExperimentalComposeUiApi::class
 )
 @Composable
 fun FacultyScreen(
-    navController: NavHostController,
+    rootNavBackStack: NavBackStack<NavKey>,
     viewModel: FacultyScreenViewModel = koinViewModel()
 ) {
     val facultyList by viewModel.faculty.collectAsState()
@@ -123,13 +123,13 @@ fun FacultyScreen(
     if (
         searchBarState.currentValue == SearchBarValue.Expanded
     ) {
-        BackHandler {
-            scope.launch {
-                searchBarState.animateToCollapsed()
-                viewModel.clearSearchResult()
-                textFieldState.clearText()
-            }
-        }
+//        BackHandler {
+//            scope.launch {
+//                searchBarState.animateToCollapsed()
+//                viewModel.clearSearchResult()
+//                textFieldState.clearText()
+//            }
+//        }
     }
     val inputField =
         @Composable {
@@ -341,14 +341,9 @@ fun FacultyScreen(
                                             bottomEnd = if (index == facultyList.size - 1) 24.dp else 4.dp
                                         ),
                                         onClick = {
-                                            navController.navigate(
-                                                RootDestination.FacultyDetail(
-                                                    faculty.teacher_id ?: 0
-                                                )
-                                            ) {
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
+                                            rootNavBackStack.add(Routes.FacultyDetail(
+                                                facultyId = faculty.teacher_id ?: 0
+                                            ))
                                         }
                                     ) {
                                         Box(
@@ -383,14 +378,9 @@ fun FacultyScreen(
 
                                                 IconButton(
                                                     onClick = {
-                                                        navController.navigate(
-                                                            RootDestination.FacultyDetail(
-                                                                faculty.teacher_id ?: 0
-                                                            )
-                                                        ) {
-                                                            launchSingleTop = true
-                                                            restoreState = true
-                                                        }
+                                                        rootNavBackStack.add(Routes.FacultyDetail(
+                                                            facultyId = faculty.teacher_id ?: 0
+                                                        ))
                                                     }
                                                 ) {
                                                     Icon(
@@ -419,14 +409,9 @@ fun FacultyScreen(
                                             bottomEnd = if (index == facultySearchResult.size - 1) 24.dp else 4.dp
                                         ),
                                         onClick = {
-                                            navController.navigate(
-                                                RootDestination.FacultyDetail(
-                                                    faculty.teacher_id ?: 0
-                                                )
-                                            ) {
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
+                                            rootNavBackStack.add(Routes.FacultyDetail(
+                                                facultyId = faculty.teacher_id ?: 0
+                                            ))
                                         }
                                     ) {
                                         Box(
@@ -461,14 +446,9 @@ fun FacultyScreen(
 
                                                 IconButton(
                                                     onClick = {
-                                                        navController.navigate(
-                                                            RootDestination.FacultyDetail(
-                                                                faculty.teacher_id ?: 0
-                                                            )
-                                                        ) {
-                                                            launchSingleTop = true
-                                                            restoreState = true
-                                                        }
+                                                        rootNavBackStack.add(Routes.FacultyDetail(
+                                                            facultyId = faculty.teacher_id ?: 0
+                                                        ))
                                                     }
                                                 ) {
                                                     Icon(

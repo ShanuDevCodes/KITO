@@ -46,14 +46,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.kito.core.presentation.components.AboutELabsDialog
 import com.kito.core.presentation.components.OverallAttendanceCard
 import com.kito.core.presentation.components.ScheduleCard
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.UpcomingExamCard
 import com.kito.core.presentation.components.state.SyncUiState
-import com.kito.core.presentation.navigation.RootDestination
-import com.kito.core.presentation.navigation.TabDestination
 import com.kito.feature.settings.presentation.components.LoginDialogBox
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
@@ -67,6 +67,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.kito.core.platform.toast
 import com.kito.core.platform.sendEmail
 import com.kito.core.common.util.currentLocalDateTime
+import com.kito.core.presentation.navigation3.Routes
+import com.kito.core.presentation.navigation3.TabRoutes
+import com.kito.core.presentation.navigation3.navigateTab
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.DayOfWeek
@@ -80,7 +83,8 @@ import kito.composeapp.generated.resources.e_labs_logo
 @Composable
 fun HomeScreen(
     viewmodel: HomeViewModel = koinViewModel(),
-    navController: NavHostController
+    rootNavBackStack: NavBackStack<NavKey>,
+    tabNavBackStack: NavBackStack<NavKey>,
 ) {
     var showAboutDialog by remember { mutableStateOf(false) }
     val uiColors = UIColors()
@@ -230,7 +234,9 @@ fun HomeScreen(
                                 IconButton(
                                     onClick = {
                                         haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        navController.navigate(RootDestination.Schedule)
+                                        rootNavBackStack.add(
+                                            Routes.Schedule
+                                        )
                                     },
                                     modifier = Modifier.size(28.dp)
                                 ) {
@@ -255,7 +261,7 @@ fun HomeScreen(
                                 schedule = schedule,
                                 onCLick = {
                                     haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                    navController.navigate(RootDestination.Schedule)
+                                    rootNavBackStack.add(Routes.Schedule)
                                 }
                             )
                         }
@@ -278,7 +284,7 @@ fun HomeScreen(
                                     IconButton(
                                         onClick = {
                                             haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                            navController.navigate(RootDestination.ExamSchedule)
+                                            rootNavBackStack.add(Routes.ExamSchedule)
                                         },
                                         modifier = Modifier.size(28.dp)
                                     ) {
@@ -300,7 +306,7 @@ fun HomeScreen(
                                     item = examModel,
                                     onClick = {
                                         haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        navController.navigate(RootDestination.ExamSchedule)
+                                        rootNavBackStack.add(Routes.ExamSchedule)
                                     }
                                 )
                             }
@@ -323,13 +329,7 @@ fun HomeScreen(
                                 IconButton(
                                     onClick = {
                                         haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        navController.navigate(TabDestination.Attendance) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
+                                        tabNavBackStack.navigateTab(TabRoutes.Attendance)
                                     },
                                     modifier = Modifier.size(28.dp)
                                 ) {
@@ -363,13 +363,7 @@ fun HomeScreen(
                                     },
                                     onNavigate = {
                                         haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
-                                        navController.navigate(TabDestination.Attendance) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
+                                        tabNavBackStack.navigateTab(TabRoutes.Attendance)
                                     },
                                 )
                             }

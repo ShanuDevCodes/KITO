@@ -1,17 +1,11 @@
 package com.kito.feature.app.presentation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
@@ -35,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,36 +47,29 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navigation
-import androidx.navigation.toRoute
-import com.kito.core.presentation.components.ExpressiveEasing
-import com.kito.core.presentation.navigation.BottomBarTab
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.savedstate.serialization.SavedStateConfiguration
+import com.kito.core.datastore.PrefsRepository
 import com.kito.core.presentation.navigation.BottomBarTabs
-import com.kito.core.presentation.navigation.RootDestination
-import com.kito.core.presentation.navigation.TabDestination
-import com.kito.core.presentation.navigation.tabs
-import com.kito.feature.attendance.presentation.AttendanceListScreen
-import com.kito.feature.exam.presentation.UpcomingExamScreen
-import com.kito.feature.faculty.presentation.FacultyDetailScreen
-import com.kito.feature.faculty.presentation.FacultyScreen
-import com.kito.feature.home.presentation.HomeScreen
-import com.kito.feature.schedule.presentation.ScheduleScreen
-import com.kito.feature.settings.presentation.SettingsScreen
+import com.kito.core.presentation.navigation3.NavigationItems
+import com.kito.core.presentation.navigation3.RootNavGraph
+import com.kito.core.presentation.navigation3.Routes
+import com.kito.core.presentation.navigation3.TabRoutes
+import com.kito.core.presentation.navigation3.navigateTab
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.hazeEffect
-import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
+import kotlinx.coroutines.flow.first
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.serializer
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalHazeMaterialsApi::class, ExperimentalHazeApi::class
@@ -92,32 +80,62 @@ fun MainUI(
     deepLinkTarget: String? = null,
     onDeepLinkConsumed: () -> Unit = {}
 ) {
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val prefs: PrefsRepository = koinInject()
+    var startDestination by remember { mutableStateOf<NavKey?>(null) }
+    val rootBackStack = rememberNavBackStack(
+        configuration = SavedStateConfiguration{
+            serializersModule = SerializersModule{
+                polymorphic(NavKey::class){
+                    subclass(Routes.Tabs::class, Routes.Tabs.serializer())
+                    subclass(Routes.Schedule::class, Routes.Schedule.serializer())
+                    subclass(Routes.ExamSchedule::class, Routes.ExamSchedule.serializer())
+                    subclass(Routes.FacultyDetail::class, Routes.FacultyDetail.serializer())
+                }
+            }
+        },
+        startDestination ?: Routes.Tabs
+    )
+    val tabBackStack =  rememberNavBackStack(
+        configuration = SavedStateConfiguration{
+            serializersModule = SerializersModule{
+                polymorphic(NavKey::class){
+                    subclass(TabRoutes.Home::class, TabRoutes.Home.serializer())
+                    subclass(TabRoutes.Profile::class, TabRoutes.Profile.serializer())
+                    subclass(TabRoutes.Faculty::class, TabRoutes.Faculty.serializer())
+                    subclass(TabRoutes.Attendance::class, TabRoutes.Attendance.serializer())
+                }
+            }
+        },
+        TabRoutes.Home
+    )
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val shouldShowBottomBar = currentDestination?.hierarchy?.any { it.hasRoute<RootDestination.Tabs>() } == true
+    val shouldShowBottomBar = rootBackStack.last() == Routes.Tabs
     val snackbarHostState = remember { SnackbarHostState() }
     val navigationBarType = rememberNavigationBarType()
-
     LaunchedEffect(deepLinkTarget) {
         if (deepLinkTarget == "schedule") {
-            navController.navigate(RootDestination.Schedule) {
-                launchSingleTop = true
-            }
+            rootBackStack.add(Routes.Schedule)
             onDeepLinkConsumed()
         }
     }
-
+    LaunchedEffect(Unit) {
+        val onboardingDone = prefs.onBoardingFlow.first()
+        val isUserSetupDone = prefs.userSetupDoneFlow.first()
+        startDestination = when {
+            !onboardingDone -> Routes.Onboarding
+            !isUserSetupDone -> Routes.UserSetup
+            else -> Routes.Tabs
+        }
+    }
     LaunchedEffect(Unit) {
         appViewModel.checkResetFix()
     }
-    LaunchedEffect(currentDestination) {
+    LaunchedEffect(tabBackStack) {
         selectedTabIndex = when {
-            currentDestination?.hasRoute<TabDestination.Home>() == true -> 0
-            currentDestination?.hasRoute<TabDestination.Attendance>() == true -> 1
-            currentDestination?.hasRoute<TabDestination.Faculty>() == true -> 2
-            currentDestination?.hasRoute<TabDestination.Profile>() == true -> 3
+            tabBackStack.last() == TabRoutes.Home -> 0
+            tabBackStack.last() == TabRoutes.Attendance -> 1
+            tabBackStack.last() == TabRoutes.Faculty -> 2
+            tabBackStack.last() == TabRoutes.Profile -> 3
             else -> selectedTabIndex
         }
     }
@@ -171,9 +189,8 @@ fun MainUI(
                             dampingRatio = Spring.DampingRatioLowBouncy,
                         )
                     )
-
                     val animatedColor by animateColorAsState(
-                        targetValue = if (selectedTabIndex in tabs.indices) tabs[selectedTabIndex].color else Color.White,
+                        targetValue = NavigationItems[selectedTabIndex].color,
                         label = "animatedColor",
                         animationSpec = spring(
                             stiffness = Spring.StiffnessLow,
@@ -183,7 +200,7 @@ fun MainUI(
                     Canvas(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        val tabWidth = size.width / tabs.size
+                        val tabWidth = size.width / NavigationItems.size
                         val centerOffset = tabWidth * animatedSelectedTabIndex + tabWidth / 2
 
                         drawCircle(
@@ -222,22 +239,10 @@ fun MainUI(
                     }
 
                     BottomBarTabs(
-                        tabs = tabs,
+                        tabs = NavigationItems,
                         selectedTab = selectedTabIndex,
-                        onTabSelected = { tab ->
-                            val destination = when (tab) {
-                                BottomBarTab.Home -> TabDestination.Home
-                                BottomBarTab.Attendance -> TabDestination.Attendance
-                                BottomBarTab.Faculty -> TabDestination.Faculty
-                                BottomBarTab.Settings -> TabDestination.Profile
-                            }
-                            navController.navigate(destination) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                        onTabSelected = { item ->
+                            tabBackStack.navigateTab(item.destination)
                         }
                     )
                 }
@@ -247,126 +252,11 @@ fun MainUI(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            NavHost(
-                navController = navController,
-                startDestination = RootDestination.Tabs,
-                modifier = Modifier.hazeSource(hazeState),
-                enterTransition = {
-                    if (
-                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                    ) {
-                        fadeIn(
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    } else {
-                        slideIntoContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                            animationSpec = tween(
-                                durationMillis = 600,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    }
-                },
-                exitTransition = {
-                    if (
-                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                    ) {
-                        fadeOut(
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    } else {
-                        slideOutHorizontally(
-                            targetOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
-                            animationSpec = tween(
-                                durationMillis = 600,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    }
-                },
-                popEnterTransition = {
-                    if (
-                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                    ) {
-                        fadeIn(
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    } else {
-                        slideInHorizontally(
-                            initialOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
-                            animationSpec = tween(
-                                durationMillis = 300,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    }
-                },
-                popExitTransition = {
-                    if (
-                        initialState.destination.isInTabs() && targetState.destination.isInTabs()
-                    ) {
-                        fadeOut(
-                            animationSpec = tween(
-                                durationMillis = 400,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    } else {
-                        slideOutOfContainer(
-                            towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                            animationSpec = tween(
-                                durationMillis = 300,
-                                easing = ExpressiveEasing.Emphasized
-                            )
-                        )
-                    }
-                }
-            ) {
-                navigation<RootDestination.Tabs>(
-                    startDestination = TabDestination.Home,
-                ) {
-                    composable<TabDestination.Home> {
-                        HomeScreen(
-                            navController = navController
-                        )
-                    }
-                    composable<TabDestination.Attendance> {
-                        AttendanceListScreen()
-                    }
-                    composable<TabDestination.Faculty> {
-                        FacultyScreen(navController)
-                    }
-                    composable<TabDestination.Profile> {
-                        SettingsScreen(
-                            navController = navController,
-                            snackbarHostState = snackbarHostState
-                        )
-                    }
-                }
-                composable<RootDestination.Schedule> {
-                    ScheduleScreen()
-                }
-                composable<RootDestination.FacultyDetail> { backStackEntry ->
-                    val args = backStackEntry.toRoute<RootDestination.FacultyDetail>()
-                    val facultyId = args.facultyId
-                    FacultyDetailScreen(
-                        facultyId = facultyId
-                    )
-                }
-                composable<RootDestination.ExamSchedule> {
-                    UpcomingExamScreen()
-                }
-            }
+            RootNavGraph(
+                rootNavBackStack = rootBackStack,
+                tabNavBackStack = tabBackStack,
+                snackbarHostState = snackbarHostState
+            )
             if (navigationBarType == NavigationBarType.ThreeButton) {
                 Box(
                     modifier = Modifier
@@ -387,9 +277,6 @@ fun MainUI(
     }
 }
 
-private fun NavDestination.isInTabs(): Boolean =
-    hierarchy.any { it.hasRoute<RootDestination.Tabs>() }
-
 @Composable
 fun rememberNavigationBarType(): NavigationBarType {
     val density = LocalDensity.current
@@ -407,6 +294,6 @@ enum class NavigationBarType {
 }
 
 inline fun <reified T : Any> NavDestination.hasRoute(): Boolean {
-    val serialName = kotlinx.serialization.serializer<T>().descriptor.serialName
+    val serialName = serializer<T>().descriptor.serialName
     return this.route?.split("/")?.get(0) == serialName
 }

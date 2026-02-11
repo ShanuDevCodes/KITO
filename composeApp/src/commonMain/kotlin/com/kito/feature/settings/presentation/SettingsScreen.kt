@@ -60,9 +60,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.state.SyncUiState
-import com.kito.core.presentation.navigation.TabDestination
 import com.kito.feature.settings.presentation.components.AboutAppDialogBox
 import com.kito.feature.settings.presentation.components.LoginDialogBox
 import com.kito.feature.settings.presentation.components.NameChangeDialogBox
@@ -85,6 +86,8 @@ import com.kito.core.platform.openAlarmSettings
 import com.kito.core.platform.openAppSettings
 import com.kito.core.platform.sendEmail
 import com.kito.core.platform.NotificationPermissionEffect
+import com.kito.core.presentation.navigation3.TabRoutes
+import com.kito.core.presentation.navigation3.navigateTab
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalHazeApi::class,
     ExperimentalHazeMaterialsApi::class
@@ -92,7 +95,7 @@ import com.kito.core.platform.NotificationPermissionEffect
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
-    navController: NavHostController,
+    tabNavBackStack: NavBackStack<NavKey>,
     snackbarHostState: SnackbarHostState
 ) {
     val uiColors = UIColors()
@@ -274,13 +277,7 @@ fun SettingsScreen(
     LaunchedEffect(syncState) {
         if (syncState is SyncUiState.Success) {
             if (isLoginDialogOpen){
-                navController.navigate(TabDestination.Home) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
+                tabNavBackStack.navigateTab(TabRoutes.Home)
             }
             haptic.performHapticFeedback(HapticFeedbackType.Confirm)
             isNameChangeDialogOpen = false

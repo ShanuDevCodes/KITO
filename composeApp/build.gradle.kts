@@ -110,6 +110,11 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.lifecycle.viewmodel)
+
+            // Navigation 3
+            implementation(libs.jetbrains.navigation3.ui)
+            implementation(libs.jetbrains.lifecycle.viewmodel.nav3)
+            implementation(libs.jetbrains.lifecycle.viewmodel)
         }
 
         iosMain.dependencies {
