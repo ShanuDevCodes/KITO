@@ -62,7 +62,9 @@ class AppSyncUseCase(
                 }
             }
             // Trigger platform-specific post-sync actions (widgets, notifications, etc.)
-            syncTrigger.onSyncComplete()
+            val sections =
+                studentSectionRepository.getAllScheduleForStudent(rollNo = roll).first()
+            syncTrigger.onSyncComplete(roll, sections)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
