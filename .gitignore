@@ -65,3 +65,6 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# iOS secrets (mirrors Android's local.properties pattern)
+iosApp/Configuration/Secrets.xcconfig

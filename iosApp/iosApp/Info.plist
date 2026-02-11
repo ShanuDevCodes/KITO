@@ -4,5 +4,13 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>PORTAL_BASE</key>
+	<string>https://kiitportal.kiituniversity.net</string>
+	<key>WD_PATH</key>
+	<string>/sap/bc/webdynpro/sap/ZWDA_HRIQ_ST_ATTENDANCE</string>
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
 </dict>
 </plist>
