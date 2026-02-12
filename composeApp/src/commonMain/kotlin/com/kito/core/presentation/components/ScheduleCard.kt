@@ -23,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,16 +35,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import com.kito.core.common.util.currentLocalDateTime
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.database.entity.StudentSectionEntity
 import com.kito.core.presentation.components.animation.PageNotFoundAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.isoDayNumber
-import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

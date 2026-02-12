@@ -75,9 +75,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import org.koin.compose.koinInject
 import com.kito.core.database.entity.AttendanceEntity
 import com.kito.core.database.entity.toAttendanceEntity
+import com.kito.core.platform.toast
 import com.kito.core.presentation.components.AttendanceCard
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.state.SyncUiState
@@ -92,11 +92,10 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
+import org.koin.compose.koinInject
 import kotlin.math.ceil
 import kotlin.math.max
-import kotlin.math.round
 import kotlin.math.roundToInt
-import com.kito.core.platform.toast
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalHazeMaterialsApi::class, ExperimentalHazeApi::class

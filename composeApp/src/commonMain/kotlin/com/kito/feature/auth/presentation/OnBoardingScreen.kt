@@ -50,15 +50,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.painterResource
+import com.kito.core.datastore.PrefsRepository
+import com.kito.core.presentation.components.UIColors
 import kito.composeapp.generated.resources.Res
 import kito.composeapp.generated.resources.onboarding_attendence
 import kito.composeapp.generated.resources.onboarding_elabs
 import kito.composeapp.generated.resources.onboarding_schedule
-import com.kito.core.datastore.PrefsRepository
-import com.kito.core.presentation.components.UIColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

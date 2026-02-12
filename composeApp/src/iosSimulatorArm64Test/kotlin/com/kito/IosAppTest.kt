@@ -2,7 +2,6 @@ package com.kito
 
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import com.kito.MainViewController
 
 class IosAppTest {
     @Test

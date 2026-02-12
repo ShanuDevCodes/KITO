@@ -20,13 +20,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.FilePresent
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
@@ -58,11 +58,18 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.kito.core.platform.NotificationPermissionEffect
+import com.kito.core.platform.areNotificationsEnabled
+import com.kito.core.platform.canScheduleExactAlarms
+import com.kito.core.platform.openAlarmSettings
+import com.kito.core.platform.openAppSettings
+import com.kito.core.platform.sendEmail
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.state.SyncUiState
+import com.kito.core.presentation.navigation3.TabRoutes
+import com.kito.core.presentation.navigation3.navigateTab
 import com.kito.feature.settings.presentation.components.AboutAppDialogBox
 import com.kito.feature.settings.presentation.components.LoginDialogBox
 import com.kito.feature.settings.presentation.components.NameChangeDialogBox
@@ -79,14 +86,6 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import org.koin.compose.koinInject
-import com.kito.core.platform.areNotificationsEnabled
-import com.kito.core.platform.canScheduleExactAlarms
-import com.kito.core.platform.openAlarmSettings
-import com.kito.core.platform.openAppSettings
-import com.kito.core.platform.sendEmail
-import com.kito.core.platform.NotificationPermissionEffect
-import com.kito.core.presentation.navigation3.TabRoutes
-import com.kito.core.presentation.navigation3.navigateTab
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalHazeApi::class,
     ExperimentalHazeMaterialsApi::class

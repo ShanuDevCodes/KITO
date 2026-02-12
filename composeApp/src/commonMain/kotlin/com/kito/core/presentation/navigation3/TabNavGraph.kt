@@ -5,16 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.savedstate.serialization.SavedStateConfiguration
 import com.kito.feature.attendance.presentation.AttendanceListScreen
 import com.kito.feature.faculty.presentation.FacultyScreen
 import com.kito.feature.home.presentation.HomeScreen
 import com.kito.feature.settings.presentation.SettingsScreen
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
 
 @Composable
 fun TabNavGraph(

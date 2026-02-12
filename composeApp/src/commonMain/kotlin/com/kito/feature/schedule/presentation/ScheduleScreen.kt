@@ -67,7 +67,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
-import org.koin.compose.koinInject
+import com.kito.core.common.util.currentLocalDateTime
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.platform.openUrl
 import com.kito.core.presentation.components.ExpressiveEasing
@@ -84,11 +84,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
-import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
 import kotlinx.datetime.isoDayNumber
-import kotlinx.datetime.toLocalDateTime
+import org.koin.compose.koinInject
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 

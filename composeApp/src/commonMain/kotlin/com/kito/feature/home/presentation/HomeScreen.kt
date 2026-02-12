@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -44,15 +44,20 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.kito.core.common.util.currentLocalDateTime
+import com.kito.core.platform.sendEmail
+import com.kito.core.platform.toast
 import com.kito.core.presentation.components.AboutELabsDialog
 import com.kito.core.presentation.components.OverallAttendanceCard
 import com.kito.core.presentation.components.ScheduleCard
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.UpcomingExamCard
 import com.kito.core.presentation.components.state.SyncUiState
+import com.kito.core.presentation.navigation3.Routes
+import com.kito.core.presentation.navigation3.TabRoutes
+import com.kito.core.presentation.navigation3.navigateTab
 import com.kito.feature.settings.presentation.components.LoginDialogBox
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
@@ -61,20 +66,12 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.coroutines.delay
-import org.koin.compose.koinInject
-import com.kito.core.platform.toast
-import com.kito.core.platform.sendEmail
-import com.kito.core.common.util.currentLocalDateTime
-import com.kito.core.presentation.navigation3.Routes
-import com.kito.core.presentation.navigation3.TabRoutes
-import com.kito.core.presentation.navigation3.navigateTab
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.DayOfWeek
-import org.jetbrains.compose.resources.painterResource
 import kito.composeapp.generated.resources.Res
 import kito.composeapp.generated.resources.e_labs_logo
+import kotlinx.coroutines.delay
+import kotlinx.datetime.DayOfWeek
+import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalHazeApi::class,
     ExperimentalHazeMaterialsApi::class

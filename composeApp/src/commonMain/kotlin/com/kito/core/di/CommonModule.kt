@@ -9,14 +9,14 @@ import com.kito.core.network.supabase.SupabaseRepository
 import com.kito.core.presentation.components.AppSyncUseCase
 import com.kito.core.presentation.components.StartupSyncGuard
 import com.kito.feature.app.presentation.AppViewModel
+import com.kito.feature.attendance.presentation.AttendanceListScreenViewModel
 import com.kito.feature.auth.presentation.UserSetupViewModel
 import com.kito.feature.exam.presentation.UpcomingExamViewModel
 import com.kito.feature.faculty.presentation.FacultyDetailViewModel
 import com.kito.feature.faculty.presentation.FacultyScreenViewModel
+import com.kito.feature.home.presentation.HomeViewModel
 import com.kito.feature.schedule.presentation.ScheduleScreenViewModel
 import com.kito.feature.settings.presentation.SettingsViewModel
-import com.kito.feature.home.presentation.HomeViewModel
-import com.kito.feature.attendance.presentation.AttendanceListScreenViewModel
 import com.kito.sap.SapPortalClient
 import com.kito.sap.SapRepository
 import kotlinx.coroutines.CoroutineScope

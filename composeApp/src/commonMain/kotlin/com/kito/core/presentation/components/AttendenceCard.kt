@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kito.core.database.entity.AttendanceEntity
-import com.kito.sap.sensitive.SapPortalUrls
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

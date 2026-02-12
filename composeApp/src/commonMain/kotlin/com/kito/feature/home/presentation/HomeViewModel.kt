@@ -1,5 +1,20 @@
 package com.kito.feature.home.presentation
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kito.core.common.util.currentLocalDateTime
+import com.kito.core.database.entity.AttendanceEntity
+import com.kito.core.database.entity.StudentSectionEntity
+import com.kito.core.database.repository.AttendanceRepository
+import com.kito.core.database.repository.StudentSectionRepository
+import com.kito.core.datastore.PrefsRepository
+import com.kito.core.network.supabase.SupabaseRepository
+import com.kito.core.network.supabase.model.MidsemScheduleModel
+import com.kito.core.platform.ConnectivityObserver
+import com.kito.core.platform.SecureStorage
+import com.kito.core.presentation.components.AppSyncUseCase
+import com.kito.core.presentation.components.StartupSyncGuard
+import com.kito.core.presentation.components.state.SyncUiState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,29 +28,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.todayIn
-
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-
-import com.kito.core.platform.ConnectivityObserver
-import com.kito.core.database.entity.AttendanceEntity
-import com.kito.core.database.entity.StudentSectionEntity
-import com.kito.core.database.repository.AttendanceRepository
-import com.kito.core.database.repository.StudentSectionRepository
-import com.kito.core.datastore.PrefsRepository
-import com.kito.core.platform.SecureStorage
-import com.kito.core.network.supabase.SupabaseRepository
-import com.kito.core.network.supabase.model.MidsemScheduleModel
-import com.kito.core.presentation.components.AppSyncUseCase
-import com.kito.core.presentation.components.StartupSyncGuard
-import com.kito.core.presentation.components.state.SyncUiState
 
 class HomeViewModel (
     private val prefs: PrefsRepository,

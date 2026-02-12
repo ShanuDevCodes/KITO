@@ -31,9 +31,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.kito.core.presentation.components.UIColors
 import com.kito.core.platform.openUrl
 import com.kito.core.platform.sendEmail
+import com.kito.core.presentation.components.UIColors
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.HazeState
@@ -41,10 +41,10 @@ import dev.chrisbanes.haze.HazeTint
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
-import org.jetbrains.compose.resources.painterResource
 import kito.composeapp.generated.resources.Res
-import kito.composeapp.generated.resources.linkedin
 import kito.composeapp.generated.resources.github
+import kito.composeapp.generated.resources.linkedin
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalHazeMaterialsApi::class,
     ExperimentalHazeApi::class

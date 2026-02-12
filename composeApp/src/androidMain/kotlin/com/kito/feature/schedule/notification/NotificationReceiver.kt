@@ -11,11 +11,11 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
-import com.kito.shared.R
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.datastore.ProtoDataStoreProvider
 import com.kito.core.datastore.StudentSectionDatastore
 import com.kito.feature.schedule.widget.WidgetUpdater
+import com.kito.shared.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

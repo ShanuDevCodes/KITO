@@ -1,17 +1,16 @@
 package com.kito.feature.faculty.presentation
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kito.core.network.supabase.SupabaseRepository
+import com.kito.core.network.supabase.model.TeacherModel
+import com.kito.core.network.supabase.model.TeacherScheduleByIDModel
+import com.kito.core.presentation.components.state.SyncUiState
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-
-import com.kito.core.network.supabase.SupabaseRepository
-import com.kito.core.network.supabase.model.TeacherModel
-import com.kito.core.network.supabase.model.TeacherScheduleByIDModel
-import com.kito.core.presentation.components.state.SyncUiState
 class FacultyDetailViewModel(
     private val repository: SupabaseRepository
 ) : ViewModel() {

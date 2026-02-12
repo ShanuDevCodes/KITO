@@ -1,8 +1,6 @@
 
 package com.kito.core.di
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.room.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.kito.core.database.AppDB
@@ -14,11 +12,11 @@ import com.kito.feature.schedule.notification.IosNotificationController
 import com.kito.feature.schedule.notification.NotificationController
 import kotlinx.cinterop.ExperimentalForeignApi
 import okio.Path.Companion.toPath
-import org.koin.mp.KoinPlatform
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.koin.mp.KoinPlatform
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL

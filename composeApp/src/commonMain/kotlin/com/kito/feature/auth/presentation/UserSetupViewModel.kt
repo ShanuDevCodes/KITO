@@ -1,15 +1,14 @@
 package com.kito.feature.auth.presentation
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kito.core.datastore.PrefsRepository
+import com.kito.core.platform.SecureStorage
+import com.kito.core.presentation.components.AppSyncUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-
-import com.kito.core.datastore.PrefsRepository
-import com.kito.core.platform.SecureStorage
-import com.kito.core.presentation.components.AppSyncUseCase
 class UserSetupViewModel(
     private val prefs: PrefsRepository,
     private val secureStorage: SecureStorage,

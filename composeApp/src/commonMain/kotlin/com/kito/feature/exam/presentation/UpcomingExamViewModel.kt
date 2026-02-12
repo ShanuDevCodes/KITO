@@ -1,24 +1,19 @@
 package com.kito.feature.exam.presentation
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import com.kito.core.common.util.currentLocalDateTime
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.todayIn
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
+import com.kito.core.common.util.currentLocalDateTime
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.network.supabase.SupabaseRepository
 import com.kito.core.network.supabase.model.MidsemScheduleModel
 import com.kito.core.presentation.components.state.SyncUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
 
 class UpcomingExamViewModel(
     private val prefs: PrefsRepository,

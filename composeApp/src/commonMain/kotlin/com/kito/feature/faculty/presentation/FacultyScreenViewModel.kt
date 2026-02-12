@@ -1,18 +1,17 @@
 package com.kito.feature.faculty.presentation
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.kito.core.network.supabase.SupabaseRepository
+import com.kito.core.network.supabase.model.TeacherFuzzySearchModel
+import com.kito.core.network.supabase.model.TeacherModel
+import com.kito.core.platform.ConnectivityObserver
+import com.kito.core.presentation.components.state.SearchResultState
+import com.kito.core.presentation.components.state.SyncUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-
-import com.kito.core.platform.ConnectivityObserver
-import com.kito.core.network.supabase.SupabaseRepository
-import com.kito.core.network.supabase.model.TeacherFuzzySearchModel
-import com.kito.core.network.supabase.model.TeacherModel
-import com.kito.core.presentation.components.state.SearchResultState
-import com.kito.core.presentation.components.state.SyncUiState
 class FacultyScreenViewModel(
     private val repository: SupabaseRepository,
     private val connectivityObserver: ConnectivityObserver

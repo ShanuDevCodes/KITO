@@ -1,17 +1,17 @@
 package com.kito.core.platform
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.widget.Toast
-import androidx.core.net.toUri
-import io.ktor.client.engine.HttpClientEngine
 import android.app.AlarmManager
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import io.ktor.client.engine.okhttp.OkHttp
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.core.net.toUri
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.okhttp.OkHttp
 
 actual fun openUrl(url: String) {
     val context = PlatformContext.applicationContext
