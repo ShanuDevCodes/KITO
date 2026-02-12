@@ -8,6 +8,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -69,6 +71,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
@@ -326,12 +329,10 @@ private fun AppSplash() {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFF121116))
             .hazeEffect(
                 state = rememberHazeState(),
                 style = HazeMaterials.regular()
-            ), 
-        contentAlignment = Alignment.Center
-    ) {
-         // Placeholder for app logo or splash content
-    }
+            )
+    )
 }

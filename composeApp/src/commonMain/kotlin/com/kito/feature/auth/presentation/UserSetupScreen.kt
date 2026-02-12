@@ -107,6 +107,7 @@ fun UserSetupScreen(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFF121116))
             .padding(horizontal = 24.dp)
             .imePadding()
     ) {

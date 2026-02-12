@@ -123,7 +123,7 @@ fun OnBoardingScreen( onOnboardingComplete: () -> Unit) {
         }
     }
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = Color(0xFF121116),
         contentWindowInsets = WindowInsets(0)
     ) {
         Box(
