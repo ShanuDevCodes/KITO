@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
@@ -11,13 +11,22 @@ plugins {
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-    androidTarget {
-        @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
+    // Android Library Configuration
+    androidLibrary {
+        namespace = "com.kito.shared"
+        compileSdk = 36
+        minSdk = 26
+        
+        // Enable Android resources in KMP
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+        
+        with(compilerOptions) {
             jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-Xexpect-actual-classes")
         }
     }
+
+    applyDefaultHierarchyTemplate()
     
     listOf(
         iosArm64(),
@@ -157,33 +166,5 @@ configurations.all {
         if (requested.group == "org.jetbrains.kotlin" && requested.name == "kotlin-metadata-jvm") {
             useVersion("2.3.0")
         }
-    }
-}
-
-android {
-    namespace = "com.kito.shared"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 26
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
-    buildTypes {
-        debug { }
-        release { }
-        create("internal_testing") {
-            initWith(getByName("release"))
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    buildFeatures {
-        compose = true
     }
 }

@@ -116,7 +116,6 @@ fun HomeScreen(
             DayOfWeek.FRIDAY -> "FRI"
             DayOfWeek.SATURDAY -> "SAT"
             DayOfWeek.SUNDAY -> "SUN"
-            else -> "SUN"
         }
         viewmodel.updateDay(dayString)
         viewmodel.getExamSchedule()

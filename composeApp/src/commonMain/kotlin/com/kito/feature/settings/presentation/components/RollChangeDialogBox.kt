@@ -180,7 +180,7 @@ fun RollChangeDialogBox(
     }
 }
 
-@OptIn(ExperimentalHazeMaterialsApi::class)
+@OptIn(ExperimentalHazeMaterialsApi::class, ExperimentalHazeApi::class)
 @Composable
 private fun WarningDialog(
     onDismiss: () -> Unit,

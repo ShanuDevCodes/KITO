@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
             // Handle new intents (e.g., if activity is singleTop)
             DisposableEffect(Unit) {
                 val listener = Consumer<Intent> { newIntent ->
-                    if (newIntent?.data?.scheme == "kito" && newIntent.data?.host == "schedule") {
+                    if (newIntent.data?.scheme == "kito" && newIntent.data?.host == "schedule") {
                         deepLinkTarget = "schedule"
                         this@MainActivity.intent =
                             Intent(this@MainActivity, MainActivity::class.java)

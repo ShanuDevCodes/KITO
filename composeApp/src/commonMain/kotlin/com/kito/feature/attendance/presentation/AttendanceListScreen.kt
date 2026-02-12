@@ -140,7 +140,7 @@ fun AttendanceListScreen(
 
 
                 is SyncUiState.Error ->
-                    toast(event.message ?: "Unknown Error")
+                    toast(event.message)
                 else -> {
                     toast("unknown error")
                 }
