@@ -1,3 +1,4 @@
+
 # Kito – Intelligent Academic Assistant
 
 Kito differs significantly from standard academic utilities by prioritizing **privacy, local-first data ownership, and seamless user experience**. It serves as a sophisticated frontend for your academic life, bridging the gap between legacy university portals (SAP) and modern mobile standards.
@@ -17,8 +18,11 @@ Kito is built on a robust, scalable foundation designed for reliability and main
 ### **Core Architecture: Clean Architecture + MVVM**
 The application strictly adheres to **Clean Architecture** principles, separating concerns into three distinct layers:
 *   **Presentation Layer**: Built with **Jetpack Compose** (Material 3), utilizing **MVVM (Model-View-ViewModel)** for reactive state management. UI events are decoupled from business logic, ensuring a responsive and crash-resistant interface.
-*   **Domain Layer**: Contains pure Kotlin business logic and use cases (e.g., `AppSyncUseCase`, `CalculateAttendanceUseCase`).
+*   **Domain Layer**: Contains pure Kotlin business logic and use cases (e.g., `AppSyncUseCase`, `CalculateAttendanceUseCase`). This layer is platform-agnostic, paving the way for full Multiplatform (KMP) support.
 *   **Data Layer**: Manages data sources through the **Repository Pattern**. It arbitrates between the local database (Room), **DataStore Preferences** (Key-Value storage), and network data sources.
+
+### **Kotlin Multiplatform (KMP) Readiness**
+The project is structured for **Kotlin Multiplatform**, separating code into `commonMain` (business logic) and `androidMain` (platform-specific implementations). This forward-looking design ensures that the core logic can be shared across iOS and Desktop targets in the future.
 
 ---
 
@@ -67,18 +71,18 @@ Kito goes beyond attendance to manage your entire academic life:
 
 ## 🛠️ Technology Stack
 
-| Category | Technologies                                 |
-| :--- |:---------------------------------------------|
-| **Language** | Kotlin 2.0+                                  |
-| **UI Toolkit** | Jetpack Compose, Material 3                  |
-| **Architecture** | Clean Architecture, MVVM                     |
-| **Dependency Injection** | Hilt (Dagger)                                |
-| **Asynchronous** | Kotlin Coroutines, Flow                      |
-| **Networking** | OkHttp, Retrofit (Supabase/Rest)             |
-| **Persistence** | Room (SQLite), Proto DataStore               |
-| **Background Jobs** | WorkManager                                  |
+| Category | Technologies |
+| :--- | :--- |
+| **Language** | Kotlin 2.3+ |
+| **UI Toolkit** | Jetpack Compose, Material 3 |
+| **Architecture** | Clean Architecture, MVVM |
+| **Dependency Injection** | Hilt (Dagger) |
+| **Asynchronous** | Kotlin Coroutines, Flow |
+| **Networking** | OkHttp, Retrofit (Supabase/Rest) |
+| **Persistence** | Room (SQLite), Proto DataStore |
+| **Background Jobs** | WorkManager |
 | **Security** | Android Keystore, EncryptedSharedPreferences |
-| **Tools** | Gradle (Kotlin DSL), Version Catalog         |
+| **Tools** | Gradle (Kotlin DSL), Version Catalog |
 
 ---
 

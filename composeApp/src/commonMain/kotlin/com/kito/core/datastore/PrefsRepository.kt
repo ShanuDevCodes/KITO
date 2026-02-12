@@ -1,0 +1,112 @@
+package com.kito.core.datastore
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+class PrefsRepository(
+    private val dataStore: DataStore<Preferences>
+) {
+    companion object {
+        private val KEY_ACADEMIC_YEAR = stringPreferencesKey("academic_year")
+        private val KEY_TERM_CODE = stringPreferencesKey("term_code")
+
+        private val KEY_ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
+        private val KEY_USER_SETUP_DONE = booleanPreferencesKey("user_setup_done")
+        private val KEY_USER_NAME = stringPreferencesKey("user_name")
+        private val KEY_USER_ROLLNUMBER = stringPreferencesKey("User_Password")
+        private val KEY_REQUIRED_ATTENDANCE = intPreferencesKey("required_attendance")
+
+        private val KEY_RESET_FIX = booleanPreferencesKey("reset_fix")
+
+        private val KEY_NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+        private val KEY_SAP_PASSWORD = stringPreferencesKey("sap_password")
+    }
+
+    val notificationStateFlow = dataStore.data
+        .map { it[KEY_NOTIFICATIONS_ENABLED] ?: false }
+    val resetFixFlow = dataStore.data
+        .map { it[KEY_RESET_FIX] ?: false }
+
+    val requiredAttendanceFlow = dataStore.data
+        .map { it[KEY_REQUIRED_ATTENDANCE] ?: 75 }
+    val userNameFlow = dataStore.data
+        .map { it[KEY_USER_NAME] ?: "" }
+
+    val userRollFlow = dataStore.data
+        .map { it[KEY_USER_ROLLNUMBER] ?: "" }
+
+    val academicYearFlow = dataStore.data
+        .map { it[KEY_ACADEMIC_YEAR] ?: "" }
+
+    val termCodeFlow = dataStore.data
+        .map { it[KEY_TERM_CODE] ?: "" }
+
+    val onBoardingFlow = dataStore.data
+        .map { it[KEY_ONBOARDING_DONE] ?: false }
+
+    val userSetupDoneFlow = dataStore.data
+        .map { it[KEY_USER_SETUP_DONE] ?: false }
+
+    val sapPasswordFlow = dataStore.data
+        .map { it[KEY_SAP_PASSWORD] ?: "" }
+
+    suspend fun setUserName(username: String) {
+        dataStore.edit { it[KEY_USER_NAME] = username }
+    }
+
+    suspend fun setUserRollNumber(rollNumber: String) {
+        dataStore.edit { it[KEY_USER_ROLLNUMBER] = rollNumber }
+    }
+
+    suspend fun setUserSetupDone() {
+        dataStore.edit { it[KEY_USER_SETUP_DONE] = true }
+    }
+
+    suspend fun setOnboardingDone() {
+        dataStore.edit { it[KEY_ONBOARDING_DONE] = true }
+    }
+
+    suspend fun setAcademicYear(year: String) {
+        dataStore.edit { it[KEY_ACADEMIC_YEAR] = year }
+    }
+
+    suspend fun setTermCode(term: String) {
+        dataStore.edit { it[KEY_TERM_CODE] = term }
+    }
+
+    suspend fun setRequiredAttendance(attendance: Int) {
+        dataStore.edit {
+            it[KEY_REQUIRED_ATTENDANCE] = attendance
+        }
+    }
+
+    suspend fun setResetDone(){
+        dataStore.edit {
+            it[KEY_RESET_FIX] = true
+        }
+    }
+
+    suspend fun setNotificationState(state: Boolean) {
+        dataStore.edit {
+            it[KEY_NOTIFICATIONS_ENABLED] = state
+        }
+    }
+
+    suspend fun saveSapPassword(password: String) {
+        dataStore.edit { it[KEY_SAP_PASSWORD] = password }
+    }
+
+    suspend fun getSapPassword(): String {
+        return dataStore.data.map { it[KEY_SAP_PASSWORD] ?: "" }.firstOrNull() ?: ""
+    }
+
+    suspend fun clearSapPassword() {
+        dataStore.edit { it.remove(KEY_SAP_PASSWORD) }
+    }
+}
+
