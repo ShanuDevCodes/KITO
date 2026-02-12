@@ -44,8 +44,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
+
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.kito.core.presentation.components.AboutELabsDialog
@@ -63,7 +62,7 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.delay
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import com.kito.core.platform.toast
 import com.kito.core.platform.sendEmail
 import com.kito.core.common.util.currentLocalDateTime
@@ -82,7 +81,7 @@ import kito.composeapp.generated.resources.e_labs_logo
 )
 @Composable
 fun HomeScreen(
-    viewmodel: HomeViewModel = koinViewModel(),
+    viewmodel: HomeViewModel = koinInject(),
     rootNavBackStack: NavBackStack<NavKey>,
     tabNavBackStack: NavBackStack<NavKey>,
 ) {

@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 class PrefsRepository(
     private val dataStore: DataStore<Preferences>
@@ -23,6 +24,7 @@ class PrefsRepository(
         private val KEY_RESET_FIX = booleanPreferencesKey("reset_fix")
 
         private val KEY_NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
+        private val KEY_SAP_PASSWORD = stringPreferencesKey("sap_password")
     }
 
     val notificationStateFlow = dataStore.data
@@ -49,6 +51,9 @@ class PrefsRepository(
 
     val userSetupDoneFlow = dataStore.data
         .map { it[KEY_USER_SETUP_DONE] ?: false }
+
+    val sapPasswordFlow = dataStore.data
+        .map { it[KEY_SAP_PASSWORD] ?: "" }
 
     suspend fun setUserName(username: String) {
         dataStore.edit { it[KEY_USER_NAME] = username }
@@ -90,6 +95,18 @@ class PrefsRepository(
         dataStore.edit {
             it[KEY_NOTIFICATIONS_ENABLED] = state
         }
+    }
+
+    suspend fun saveSapPassword(password: String) {
+        dataStore.edit { it[KEY_SAP_PASSWORD] = password }
+    }
+
+    suspend fun getSapPassword(): String {
+        return dataStore.data.map { it[KEY_SAP_PASSWORD] ?: "" }.firstOrNull() ?: ""
+    }
+
+    suspend fun clearSapPassword() {
+        dataStore.edit { it.remove(KEY_SAP_PASSWORD) }
     }
 }
 

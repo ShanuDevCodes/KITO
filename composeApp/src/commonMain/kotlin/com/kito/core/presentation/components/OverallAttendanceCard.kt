@@ -293,7 +293,7 @@ fun OverallAttendanceCard(
                                     }
                                 )
                                 Text(
-                                    text = "${"%.1f".format(progressHighest * 100)}%",
+                                    text = "${(progressHighest * 100).toInt()}%",
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.titleLargeEmphasized
                                 )
@@ -335,7 +335,7 @@ fun OverallAttendanceCard(
                                     }
                                 )
                                 Text(
-                                    text = "${"%.1f".format(progressOverall * 100)}%",
+                                    text = "${(progressOverall * 100).toInt()}%",
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.titleLargeEmphasized
                                 )
@@ -377,7 +377,7 @@ fun OverallAttendanceCard(
                                     }
                                 )
                                 Text(
-                                    text = "${"%.1f".format(progressLowest * 100)}%",
+                                    text = "${(progressLowest * 100).toInt()}%",
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.titleLargeEmphasized
                                 )

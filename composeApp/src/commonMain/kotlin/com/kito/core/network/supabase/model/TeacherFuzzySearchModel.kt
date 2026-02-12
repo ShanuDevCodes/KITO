@@ -1,10 +1,8 @@
 package com.kito.core.network.supabase.model
 
 import kotlinx.serialization.Serializable
-import androidx.annotation.Keep
 
 @Serializable
-@Keep
 data class TeacherFuzzySearchModel(
     val email: String? = null,
     val name: String? = null,

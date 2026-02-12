@@ -67,7 +67,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.platform.openUrl
 import com.kito.core.presentation.components.ExpressiveEasing
@@ -97,7 +97,7 @@ import kotlin.random.Random
 )
 @Composable
 fun ScheduleScreen(
-    viewModel: ScheduleScreenViewModel = koinViewModel(),
+    viewModel: ScheduleScreenViewModel = koinInject(),
 ) {
     val today = todayKey()
     val currentPage = when (today) {

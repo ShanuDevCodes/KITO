@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -41,7 +42,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import com.kito.core.common.util.formatTo12Hour
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.common.util.formatDate
@@ -54,20 +55,23 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
 
 
 @OptIn(ExperimentalHazeMaterialsApi::class, ExperimentalMaterial3ExpressiveApi::class,
-    ExperimentalHazeApi::class
+    ExperimentalHazeApi::class, ExperimentalMaterial3Api::class
 )
 @Composable
 fun UpcomingExamScreen(
-    viewModel: UpcomingExamViewModel = koinViewModel()
+    viewmodel: UpcomingExamViewModel = koinInject()
 ) {
     val uiColors = UIColors()
     val hazeState = rememberHazeState()
-    val examModel by viewModel.examModel.collectAsState()
-    val uiState by viewModel.uiState.collectAsState()
+    val examModel by viewmodel.examModel.collectAsState()
+    val uiState by viewmodel.uiState.collectAsState()
     val meshColors = listOf(
         Color(0xFF77280F).copy(alpha = 0.82f), // burnt orange
         Color(0xFF753107).copy(alpha = 0.82f), // amber-700

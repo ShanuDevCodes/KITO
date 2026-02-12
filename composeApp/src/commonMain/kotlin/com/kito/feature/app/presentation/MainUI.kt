@@ -47,7 +47,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination
+
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
@@ -61,6 +61,7 @@ import com.kito.core.presentation.navigation3.navigateTab
 import dev.chrisbanes.haze.ExperimentalHazeApi
 import dev.chrisbanes.haze.HazeInputScale
 import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
@@ -69,14 +70,13 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.serializer
 import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
     ExperimentalHazeMaterialsApi::class, ExperimentalHazeApi::class
 )
 @Composable
 fun MainUI(
-    appViewModel: AppViewModel = koinViewModel(),
+    appViewModel: AppViewModel = koinInject(),
     deepLinkTarget: String? = null,
     onDeepLinkConsumed: () -> Unit = {}
 ) {
@@ -130,7 +130,7 @@ fun MainUI(
     LaunchedEffect(Unit) {
         appViewModel.checkResetFix()
     }
-    LaunchedEffect(tabBackStack) {
+    LaunchedEffect(tabBackStack.last()) {
         selectedTabIndex = when {
             tabBackStack.last() == TabRoutes.Home -> 0
             tabBackStack.last() == TabRoutes.Attendance -> 1
@@ -252,11 +252,15 @@ fun MainUI(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            RootNavGraph(
-                rootNavBackStack = rootBackStack,
-                tabNavBackStack = tabBackStack,
-                snackbarHostState = snackbarHostState
-            )
+            Box(
+                modifier = Modifier.hazeSource(hazeState)
+            ) {
+                RootNavGraph(
+                    rootNavBackStack = rootBackStack,
+                    tabNavBackStack = tabBackStack,
+                    snackbarHostState = snackbarHostState
+                )
+            }
             if (navigationBarType == NavigationBarType.ThreeButton) {
                 Box(
                     modifier = Modifier
@@ -291,9 +295,4 @@ fun rememberNavigationBarType(): NavigationBarType {
 enum class NavigationBarType {
     Gesture,
     ThreeButton
-}
-
-inline fun <reified T : Any> NavDestination.hasRoute(): Boolean {
-    val serialName = serializer<T>().descriptor.serialName
-    return this.route?.split("/")?.get(0) == serialName
 }

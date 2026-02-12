@@ -58,8 +58,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
+
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.kito.core.presentation.components.UIColors
@@ -79,7 +78,7 @@ import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 import dev.chrisbanes.haze.rememberHazeState
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import com.kito.core.platform.areNotificationsEnabled
 import com.kito.core.platform.canScheduleExactAlarms
 import com.kito.core.platform.openAlarmSettings
@@ -94,7 +93,7 @@ import com.kito.core.presentation.navigation3.navigateTab
 )
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = koinViewModel(),
+    viewModel: SettingsViewModel = koinInject(),
     tabNavBackStack: NavBackStack<NavKey>,
     snackbarHostState: SnackbarHostState
 ) {

@@ -72,9 +72,11 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.kito.core.network.supabase.model.TeacherFuzzySearchModel
+import com.kito.core.network.supabase.model.TeacherModel
 import com.kito.core.presentation.components.FacultyCardContent
 import com.kito.core.presentation.components.FacultyCardShimmer
 import com.kito.core.presentation.components.UIColors
@@ -82,7 +84,9 @@ import com.kito.core.presentation.components.animation.NoInternetAnimation
 import com.kito.core.presentation.components.state.SearchResultState
 import com.kito.core.presentation.components.state.SyncUiState
 import com.kito.core.presentation.navigation3.Routes
+import com.kito.core.presentation.navigation3.TabRoutes
 import dev.chrisbanes.haze.ExperimentalHazeApi
+import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
@@ -102,7 +106,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FacultyScreen(
     rootNavBackStack: NavBackStack<NavKey>,
-    viewModel: FacultyScreenViewModel = koinViewModel()
+    viewModel: FacultyScreenViewModel = koinInject()
 ) {
     val facultyList by viewModel.faculty.collectAsState()
     val searchResultState by viewModel.searchResultState.collectAsState()

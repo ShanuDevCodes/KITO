@@ -99,7 +99,7 @@ fun AttendanceCard(item: AttendanceEntity) {
 
         // Percentage and faculty
         Text(
-            text = "Percentage: ${"%.2f".format(item.percentage)}%",
+            text = "Percentage: ${((item.percentage * 100).toInt() / 100.0)}%",
             fontFamily = FontFamily.Monospace,
             color = uiColors.textSecondary,
             fontSize = 14.sp

@@ -25,6 +25,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            binaryOption("bundleId", "com.kito.composeApp")
         }
     }
     
@@ -66,8 +67,8 @@ kotlin {
             implementation(libs.compose.mp.ui)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.mp.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
-            implementation(libs.androidx.lifecycle.runtime.compose)
+            // implementation(libs.androidx.lifecycle.viewmodel.compose)
+            // implementation(libs.androidx.lifecycle.runtime.compose)
             
             // Ktor (KMP HTTP Client)
             implementation(libs.ktor.client.core)
@@ -95,7 +96,7 @@ kotlin {
             implementation(libs.haze.materials)
 
             // Navigation Compose
-            implementation(libs.navigation.compose)
+
 
             // Room KMP
             implementation(libs.room.runtime)
@@ -108,28 +109,45 @@ kotlin {
             // Koin
             api(libs.koin.core)
             implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
-            implementation(libs.lifecycle.viewmodel)
+            // implementation(libs.koin.compose.viewmodel)
+
 
             // Navigation 3
             implementation(libs.jetbrains.navigation3.ui)
-            implementation(libs.jetbrains.lifecycle.viewmodel.nav3)
-            implementation(libs.jetbrains.lifecycle.viewmodel)
+            // Lifecycle (JetBrains KMP wrappers with iOS support)
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.9.6")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6")
         }
 
         iosMain.dependencies {
             // Ktor engine for iOS
             implementation(libs.ktor.client.darwin)
+            implementation(libs.sqlite.bundled)
+        }
+
+        val iosSimulatorArm64Test by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
         }
         
         commonTest.dependencies {
              implementation(kotlin("test"))
         }
     }
+    // On iOS, exclude Google's androidx.lifecycle to prevent duplicate symbols.
+    // JetBrains lifecycle wrappers (2.9.6) bundle the lifecycle code for iOS;
+    // Google's artifacts also now publish iOS klibs (2.10.0-rc01 via transitives), causing duplication.
+    configurations.matching { name.contains("ios", ignoreCase = true) }.configureEach {
+        exclude(group = "androidx.lifecycle")
+    }
 }
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }
 
 // Force Kotlin metadata library version for Dagger/Hilt compatibility with Kotlin 2.3.0

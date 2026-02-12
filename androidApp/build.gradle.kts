@@ -106,7 +106,7 @@ dependencies {
     implementation(libs.material)
 
     // Navigation Compose
-    implementation(libs.navigation.compose)
+
 
     // Compose Material3
     implementation(libs.compose.mp.material3)

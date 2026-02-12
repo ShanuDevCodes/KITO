@@ -42,7 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import com.kito.core.network.supabase.model.TeacherScheduleByIDModel
 import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.meshGradient
@@ -74,7 +74,7 @@ private val dayPriority = mapOf(
 )
 @Composable
 fun FacultyDetailScreen(
-    viewModel: FacultyDetailViewModel = koinViewModel(),
+    viewModel: FacultyDetailViewModel = koinInject(),
     facultyId: Long
 ) {
     val syncState by viewModel.syncState.collectAsState()

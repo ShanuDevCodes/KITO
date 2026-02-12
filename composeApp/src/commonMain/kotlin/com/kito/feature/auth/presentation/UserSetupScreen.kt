@@ -46,11 +46,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
 import org.jetbrains.compose.resources.painterResource
 import kito.composeapp.generated.resources.Res
 import kito.composeapp.generated.resources.e_labs_logo
+import org.koin.compose.koinInject
+import com.kito.core.platform.toast
 import com.kito.core.presentation.components.UIColors
+import com.kito.core.presentation.navigation3.Routes
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
+import kotlinx.coroutines.launch
 import com.kito.core.common.util.currentLocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -59,7 +64,7 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun UserSetupScreen(
     onSetupComplete: () -> Unit,
-    userSetupViewModel: UserSetupViewModel = koinViewModel()
+    userSetupViewModel: UserSetupViewModel = koinInject()
 ) {
 //    val years = (currentYear - 5..currentYear).map { it.toString() }.reversed()
 //    val terms = listOf(

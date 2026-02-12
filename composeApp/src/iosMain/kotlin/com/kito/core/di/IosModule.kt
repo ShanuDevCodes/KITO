@@ -72,6 +72,7 @@ val iosModule = module {
     // Platform Implementations
     singleOf(::ConnectivityObserver)
     singleOf(::AppSyncTrigger)
+    singleOf(::SecureStorage)
 
     // Notification Controller
     singleOf(::IosNotificationController) bind NotificationController::class

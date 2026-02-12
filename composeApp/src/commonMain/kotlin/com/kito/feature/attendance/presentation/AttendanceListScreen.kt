@@ -75,7 +75,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.koinInject
 import com.kito.core.database.entity.AttendanceEntity
 import com.kito.core.database.entity.toAttendanceEntity
 import com.kito.core.presentation.components.AttendanceCard
@@ -103,7 +103,7 @@ import com.kito.core.platform.toast
 )
 @Composable
 fun AttendanceListScreen(
-    viewModel: AttendanceListScreenViewModel = koinViewModel(),
+    viewModel: AttendanceListScreenViewModel = koinInject(),
 ) {
     val cardHaze = rememberHazeState()
     val uiColors = UIColors()

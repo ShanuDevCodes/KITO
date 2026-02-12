@@ -23,6 +23,7 @@ import kotlinx.datetime.todayIn
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+
 import com.kito.core.platform.ConnectivityObserver
 import com.kito.core.database.entity.AttendanceEntity
 import com.kito.core.database.entity.StudentSectionEntity
