@@ -266,7 +266,7 @@ fun MainUI(
                         snackbarHostState = snackbarHostState
                     )
                 }
-                if (navigationBarType == NavigationBarType.ThreeButton) {
+                if (isAndroid() && navigationBarType == NavigationBarType.ThreeButton) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
@@ -288,6 +288,7 @@ fun MainUI(
     }
 }
 
+expect fun isAndroid(): Boolean
 @Composable
 fun rememberNavigationBarType(): NavigationBarType {
     val density = LocalDensity.current

@@ -23,7 +23,7 @@ fun TabNavGraph(
     tabNavStack: NavBackStack<NavKey>,
     snackbarHostState: SnackbarHostState
 ){
-    NavDisplay<NavKey>(
+    NavDisplay(
         backStack = tabNavStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator()

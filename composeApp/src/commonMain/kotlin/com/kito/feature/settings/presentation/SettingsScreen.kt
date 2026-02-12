@@ -70,6 +70,7 @@ import com.kito.core.presentation.components.UIColors
 import com.kito.core.presentation.components.state.SyncUiState
 import com.kito.core.presentation.navigation3.TabRoutes
 import com.kito.core.presentation.navigation3.navigateTab
+import com.kito.feature.app.presentation.isAndroid
 import com.kito.feature.settings.presentation.components.AboutAppDialogBox
 import com.kito.feature.settings.presentation.components.LoginDialogBox
 import com.kito.feature.settings.presentation.components.NameChangeDialogBox
@@ -122,7 +123,7 @@ fun SettingsScreen(
         }
     }
 
-    val settingsItems = listOf(
+    val settingsItems = listOfNotNull(
         SettingsItem(
             title = "Name",
             value = name,
@@ -163,19 +164,21 @@ fun SettingsScreen(
             },
             editButton = true,
         ),
-        SettingsItem(
-            title = "Set Notification",
-            value = if (notificationState) "Enabled" else "Disabled",
-            icon = Icons.Default.Notifications,
-            onClick = {
-                if (notificationState) {
-                    viewModel.setNotificationState(false)
-                } else {
-                    viewModel.requestEnableNotifications()
-                }
-            },
-            toggle = true
-        ),
+        if(isAndroid()) {
+            SettingsItem(
+                title = "Set Notification",
+                value = if (notificationState) "Enabled" else "Disabled",
+                icon = Icons.Default.Notifications,
+                onClick = {
+                    if (notificationState) {
+                        viewModel.setNotificationState(false)
+                    } else {
+                        viewModel.requestEnableNotifications()
+                    }
+                },
+                toggle = true
+            )
+        }else null,
         SettingsItem(
             title = "FeedBack",
             value = "Submit your feedback",
@@ -234,44 +237,39 @@ fun SettingsScreen(
     )
     val pendingEnable by viewModel.pendingNotificationEnable.collectAsState()
 
-    LaunchedEffect(Unit) {
-        if (canScheduleExactAlarms() && areNotificationsEnabled()) {
-             viewModel.setNotificationState(true)
-        }
-    }
-
-    LaunchedEffect(pendingEnable) {
-        if (!pendingEnable) return@LaunchedEffect
-        
-        if (!canScheduleExactAlarms()) {
-            val result = snackbarHostState.showSnackbar(
-                message = "Allow exact alarms to receive timely notifications",
-                actionLabel = "Allow",
-                withDismissAction = true
-            )
-
-            if (result == SnackbarResult.ActionPerformed) {
-                openAlarmSettings()
+    if(isAndroid()) {
+        LaunchedEffect(Unit) {
+            if (canScheduleExactAlarms() && areNotificationsEnabled()) {
+                viewModel.setNotificationState(true)
             }
         }
-        
-        if (!areNotificationsEnabled()) {
-             val result = snackbarHostState.showSnackbar(
-                message = "Notification permission is required to enable alerts. Please enable in settings.",
-                actionLabel = "Settings",
-                withDismissAction = true
-            )
-
-            if (result == SnackbarResult.ActionPerformed) {
-                openAppSettings()
+        LaunchedEffect(pendingEnable) {
+            if (!pendingEnable) return@LaunchedEffect
+            if (!canScheduleExactAlarms()) {
+                val result = snackbarHostState.showSnackbar(
+                    message = "Allow exact alarms to receive timely notifications",
+                    actionLabel = "Allow",
+                    withDismissAction = true
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    openAlarmSettings()
+                }
             }
-        } else if (canScheduleExactAlarms()) {
-             viewModel.setNotificationState(true)
+            if (!areNotificationsEnabled()) {
+                val result = snackbarHostState.showSnackbar(
+                    message = "Notification permission is required to enable alerts. Please enable in settings.",
+                    actionLabel = "Settings",
+                    withDismissAction = true
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    openAppSettings()
+                }
+            } else if (canScheduleExactAlarms()) {
+                viewModel.setNotificationState(true)
+            }
+            viewModel.clearPendingNotificationEnable()
         }
-        
-        viewModel.clearPendingNotificationEnable()
     }
-    
     LaunchedEffect(syncState) {
         if (syncState is SyncUiState.Success) {
             if (isLoginDialogOpen){
