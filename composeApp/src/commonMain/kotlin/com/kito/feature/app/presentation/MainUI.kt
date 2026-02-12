@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
@@ -52,10 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
-import com.kashif_e.backdrop.backdrops.layerBackdrop
-import com.kashif_e.backdrop.backdrops.rememberLayerBackdrop
-import com.kashif_e.backdrop.drawBackdrop
-import com.kashif_e.backdrop.effects.blur
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.presentation.navigation.BottomBarTabs
 import com.kito.core.presentation.navigation3.NavigationItems
@@ -84,7 +79,6 @@ fun MainUI(
     deepLinkTarget: String? = null,
     onDeepLinkConsumed: () -> Unit = {}
 ) {
-    val backdrop = rememberLayerBackdrop()
     val prefs: PrefsRepository = koinInject()
     var startDestination by remember { mutableStateOf<NavKey?>(null) }
     val rootBackStack = rememberNavBackStack(
@@ -169,19 +163,12 @@ fun MainUI(
                             .fillMaxWidth()
                             .height(64.dp)
                             .clip(CircleShape)
-//                            .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
-//                                blurRadius = 15.dp
-//                                noiseFactor = 0.05f
-//                                inputScale = HazeInputScale.Auto
-//                                alpha = 0.98f
-//                            }
-                            .drawBackdrop(
-                                backdrop = backdrop,
-                                shape = { RoundedCornerShape(24.dp) },
-                                effects = {
-                                    blur(16.dp.toPx())
-                                }
-                            )
+                            .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
+                                blurRadius = 15.dp
+                                noiseFactor = 0.05f
+                                inputScale = HazeInputScale.Auto
+                                alpha = 0.98f
+                            }
                             .border(
                                 width = Dp.Hairline,
                                 brush = Brush.verticalGradient(
@@ -271,7 +258,6 @@ fun MainUI(
             ) {
                 Box(
                     modifier = Modifier
-                        .layerBackdrop(backdrop)
                         .hazeSource(hazeState)
                 ) {
                     RootNavGraph(

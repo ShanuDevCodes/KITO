@@ -6,7 +6,13 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.navigation3.ui.NavDisplay
+import com.kito.core.presentation.components.ExpressiveEasing
 import com.kito.feature.exam.presentation.UpcomingExamScreen
 import com.kito.feature.faculty.presentation.FacultyDetailScreen
 import com.kito.feature.schedule.presentation.ScheduleScreen
@@ -22,6 +28,51 @@ fun RootNavGraph(
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator()
         ),
+        predictivePopTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = ExpressiveEasing.Emphasized
+                )
+            ) togetherWith slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = ExpressiveEasing.Emphasized
+                )
+            )
+        },
+        popTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = ExpressiveEasing.Emphasized
+                )
+            ) togetherWith slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = ExpressiveEasing.Emphasized
+                )
+            )
+        },
+        transitionSpec = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = ExpressiveEasing.Emphasized
+                )
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { fullWidth -> -(fullWidth * 0.3f).toInt() },
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = ExpressiveEasing.Emphasized
+                )
+            )
+        },
         entryProvider = entryProvider{
             entry<Routes.Tabs>{
                 TabNavGraph(
