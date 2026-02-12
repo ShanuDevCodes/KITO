@@ -1,6 +1,5 @@
 package com.kito.feature.faculty.presentation
 
-//import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -74,6 +73,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import androidx.navigationevent.NavigationEventHandler
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.kito.core.presentation.components.FacultyCardContent
 import com.kito.core.presentation.components.FacultyCardShimmer
 import com.kito.core.presentation.components.UIColors
@@ -120,17 +123,17 @@ fun FacultyScreen(
         val keyboardController = LocalSoftwareKeyboardController.current
         val isOnline by viewModel.isOnline.collectAsState()
         val syncState by viewModel.syncState.collectAsState()
-        if (
-            searchBarState.currentValue == SearchBarValue.Expanded
-        ) {
-//        BackHandler {
-//            scope.launch {
-//                searchBarState.animateToCollapsed()
-//                viewModel.clearSearchResult()
-//                textFieldState.clearText()
-//            }
-//        }
-        }
+        NavigationBackHandler(
+            state = rememberNavigationEventState(NavigationEventInfo.None),
+            isBackEnabled = searchBarState.currentValue == SearchBarValue.Expanded,
+            onBackCompleted = {
+                scope.launch {
+                    searchBarState.animateToCollapsed()
+                    viewModel.clearSearchResult()
+                    textFieldState.clearText()
+                }
+            }
+        )
         val inputField =
             @Composable {
                 SearchBarDefaults.InputField(
