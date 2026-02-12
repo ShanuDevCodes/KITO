@@ -106,6 +106,7 @@ dependencies {
     implementation(libs.material)
 
     // Navigation Compose
+    implementation(libs.jetbrains.navigation3.ui)
 
 
     // Compose Material3
@@ -122,6 +123,7 @@ dependencies {
 
     // Serialization (for navigation destinations)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.navigation3.runtime)
 
     // Testing
     testImplementation(libs.junit)

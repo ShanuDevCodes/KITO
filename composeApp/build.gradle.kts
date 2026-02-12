@@ -123,7 +123,7 @@ kotlin {
 
 
             // Navigation 3
-            implementation(libs.jetbrains.navigation3.ui)
+            api(libs.jetbrains.navigation3.ui)
             // Lifecycle (JetBrains KMP wrappers with iOS support)
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.9.6")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6")

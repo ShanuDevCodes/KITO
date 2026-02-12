@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.github.alexzhirkevich.compottie.LottieAnimation
+import io.github.alexzhirkevich.compottie.LottieClipSpec
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.LottieConstants
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
@@ -42,6 +43,10 @@ fun LockAnimation() {
     val progress by animateLottieCompositionAsState(
         composition,
         iterations = 1,
+        clipSpec = LottieClipSpec.Progress(
+            min = 0.30f,
+            max = 1f
+        )
     )
     LottieAnimation(
         composition = composition,

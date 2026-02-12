@@ -54,6 +54,7 @@ compottie = "1.1.1"
 navigation3 = "1.0.0"
 cmpNavigation3 = "1.0.0-alpha05"
 sqlite = "2.5.0-alpha01"
+navigation3Runtime = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -139,6 +140,7 @@ jetbrains-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lif
 
 # SQLite
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3Runtime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

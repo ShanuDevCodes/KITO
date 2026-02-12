@@ -12,7 +12,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation3.runtime.NavKey
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -38,6 +38,7 @@ import com.kito.feature.schedule.notification.NotificationPipelineController
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import com.kito.core.presentation.navigation3.Routes
 
 class MainActivity : ComponentActivity() {
 
@@ -81,8 +82,9 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            var keepOnScreenCondition by remember { mutableStateOf(true) }
+            var startDestination by remember { mutableStateOf<NavKey?>(null) }
             var deepLinkTarget by remember { mutableStateOf<String?>(null) }
+            var isReady by remember { mutableStateOf(false) }
 
             LaunchedEffect(Unit) {
                 val intent = intent
@@ -96,7 +98,12 @@ class MainActivity : ComponentActivity() {
                 notificationPipelineController.sync()
                 val onboardingDone = prefs.onBoardingFlow.first()
                 val isUserSetupDone = prefs.userSetupDoneFlow.first()
-                keepOnScreenCondition = false
+                startDestination = when {
+                    !onboardingDone -> Routes.Onboarding
+                    !isUserSetupDone -> Routes.UserSetup
+                    else -> Routes.Tabs
+                }
+                isReady = true
             }
 
             // Handle new intents (e.g., if activity is singleTop)
@@ -111,12 +118,16 @@ class MainActivity : ComponentActivity() {
                 addOnNewIntentListener(listener)
                 onDispose { removeOnNewIntentListener(listener) }
             }
-            splashScreen.setKeepOnScreenCondition { keepOnScreenCondition }
-            KitoTheme {
-                MainUI(
-                    deepLinkTarget = deepLinkTarget,
-                    onDeepLinkConsumed = { deepLinkTarget = null }
-                )
+            splashScreen.setKeepOnScreenCondition { !isReady }
+            
+            if (isReady) {
+                KitoTheme {
+                    MainUI(
+                        deepLinkTarget = deepLinkTarget,
+                        onDeepLinkConsumed = { deepLinkTarget = null },
+                        initialDestination = startDestination
+                    )
+                }
             }
         }
     }

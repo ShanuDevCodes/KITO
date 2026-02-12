@@ -59,10 +59,12 @@ import kito.composeapp.generated.resources.onboarding_schedule
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun OnBoardingScreen(prefRepository: PrefsRepository, onOnboardingComplete: () -> Unit) {
+fun OnBoardingScreen( onOnboardingComplete: () -> Unit) {
+    val prefRepository: PrefsRepository = koinInject()
     val uiColor = UIColors()
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = {3}, initialPage = 0)

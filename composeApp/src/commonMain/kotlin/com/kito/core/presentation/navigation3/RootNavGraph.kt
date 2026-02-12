@@ -13,6 +13,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.navigation3.ui.NavDisplay
 import com.kito.core.presentation.components.ExpressiveEasing
+import com.kito.feature.auth.presentation.OnBoardingScreen
+import com.kito.feature.auth.presentation.UserSetupScreen
 import com.kito.feature.exam.presentation.UpcomingExamScreen
 import com.kito.feature.faculty.presentation.FacultyDetailScreen
 import com.kito.feature.schedule.presentation.ScheduleScreen
@@ -90,6 +92,22 @@ fun RootNavGraph(
             entry<Routes.FacultyDetail>{
                 FacultyDetailScreen(
                     facultyId = it.facultyId
+                )
+            }
+            entry<Routes.Onboarding>{
+                OnBoardingScreen(
+                    onOnboardingComplete = {
+                        rootNavBackStack.clear()
+                        rootNavBackStack.add(Routes.UserSetup)
+                    }
+                )
+            }
+            entry<Routes.UserSetup>{
+                UserSetupScreen(
+                    onSetupComplete = {
+                        rootNavBackStack.clear()
+                        rootNavBackStack.add(Routes.Tabs)
+                    }
                 )
             }
         }

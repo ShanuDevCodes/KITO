@@ -68,6 +68,7 @@ import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
@@ -77,10 +78,32 @@ import org.koin.compose.koinInject
 fun MainUI(
     appViewModel: AppViewModel = koinInject(),
     deepLinkTarget: String? = null,
-    onDeepLinkConsumed: () -> Unit = {}
+    onDeepLinkConsumed: () -> Unit = {},
+    initialDestination: NavKey? = null
 ) {
     val prefs: PrefsRepository = koinInject()
-    var startDestination by remember { mutableStateOf<NavKey?>(null) }
+    var startDestination by remember { mutableStateOf(initialDestination) }
+    
+    // Only fetch if initialDestination was null (mainly for iOS or fallback)
+    LaunchedEffect(Unit) {
+        if (startDestination == null) {
+            val onboardingDone = prefs.onBoardingFlow.first()
+            val isUserSetupDone = prefs.userSetupDoneFlow.first()
+            startDestination = when {
+                !onboardingDone -> Routes.Onboarding
+                !isUserSetupDone -> Routes.UserSetup
+                else -> Routes.Tabs
+            }
+        }
+    }
+
+    val currentStartDestination = startDestination
+    // Show Splash until startDestination is determined
+    if (currentStartDestination == null) {
+        AppSplash()
+        return
+    }
+
     val rootBackStack = rememberNavBackStack(
         configuration = SavedStateConfiguration{
             serializersModule = SerializersModule{
@@ -89,10 +112,12 @@ fun MainUI(
                     subclass(Routes.Schedule::class, Routes.Schedule.serializer())
                     subclass(Routes.ExamSchedule::class, Routes.ExamSchedule.serializer())
                     subclass(Routes.FacultyDetail::class, Routes.FacultyDetail.serializer())
+                    subclass(Routes.Onboarding::class, Routes.Onboarding.serializer())
+                    subclass(Routes.UserSetup::class, Routes.UserSetup.serializer())
                 }
             }
         },
-        startDestination ?: Routes.Tabs
+        currentStartDestination // Default to Tabs, but we gate the UI until startDestination is non-null
     )
     val tabBackStack =  rememberNavBackStack(
         configuration = SavedStateConfiguration{
@@ -117,15 +142,7 @@ fun MainUI(
             onDeepLinkConsumed()
         }
     }
-    LaunchedEffect(Unit) {
-        val onboardingDone = prefs.onBoardingFlow.first()
-        val isUserSetupDone = prefs.userSetupDoneFlow.first()
-        startDestination = when {
-            !onboardingDone -> Routes.Onboarding
-            !isUserSetupDone -> Routes.UserSetup
-            else -> Routes.Tabs
-        }
-    }
+
     LaunchedEffect(Unit) {
         appViewModel.checkResetFix()
     }
@@ -303,4 +320,19 @@ fun rememberNavigationBarType(): NavigationBarType {
 enum class NavigationBarType {
     Gesture,
     ThreeButton
+}
+
+@Composable
+private fun AppSplash() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .hazeEffect(
+                state = rememberHazeState(),
+                style = HazeMaterials.regular()
+            ), 
+        contentAlignment = Alignment.Center
+    ) {
+         // Placeholder for app logo or splash content
+    }
 }
