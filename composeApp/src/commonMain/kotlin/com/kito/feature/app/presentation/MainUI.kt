@@ -142,7 +142,6 @@ fun MainUI(
             onDeepLinkConsumed()
         }
     }
-
     LaunchedEffect(Unit) {
         appViewModel.checkResetFix()
     }
