@@ -128,6 +128,9 @@ kotlin {
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.9.6")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6")
             implementation("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6")
+
+            // Liquid Glass
+            implementation("io.github.kashif-mehmood-km:backdrop:0.0.1-alpha02")
         }
 
         iosMain.dependencies {

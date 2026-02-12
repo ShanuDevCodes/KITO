@@ -286,112 +286,123 @@ fun SettingsScreen(
             viewModel.syncStateIdle()
         }
     }
-    Box {
-        LazyColumn(
-            contentPadding = PaddingValues(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 46.dp),
-            verticalArrangement = Arrangement.spacedBy(2.5.dp),
+    Box{
+        Box(
             modifier = Modifier
                 .hazeSource(hazeState)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .background(Color(0xFF121116))
         ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 46.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(2.5.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
-            itemsIndexed(settingsItems){index,item->
-                Card(
+                itemsIndexed(settingsItems) { index, item ->
+                    Card(
 
-                    shape = RoundedCornerShape(
-                        topStart = if (index == 0) 24.dp else 4.dp,
-                        topEnd = if (index == 0) 24.dp else 4.dp,
-                        bottomStart = if (index == settingsItems.size - 1) 24.dp else 4.dp,
-                        bottomEnd = if (index == settingsItems.size - 1) 24.dp else 4.dp
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    uiColors.cardBackground,
-                                    Color(0xFF2F222F),
-                                    Color(0xFF2F222F),
-                                    uiColors.cardBackgroundHigh
-                                )
-                            ),
-                            shape = RoundedCornerShape(
-                                topStart = if (index == 0) 24.dp else 4.dp,
-                                topEnd = if (index == 0) 24.dp else 4.dp,
-                                bottomStart = if (index == settingsItems.size - 1) 24.dp else 4.dp,
-                                bottomEnd = if (index == settingsItems.size - 1) 24.dp else 4.dp
-                            )
+                        shape = RoundedCornerShape(
+                            topStart = if (index == 0) 24.dp else 4.dp,
+                            topEnd = if (index == 0) 24.dp else 4.dp,
+                            bottomStart = if (index == settingsItems.size - 1) 24.dp else 4.dp,
+                            bottomEnd = if (index == settingsItems.size - 1) 24.dp else 4.dp
                         ),
-                    onClick = {
-                        item.onClick()
-                    },
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Transparent
-                    )
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-
-                        Icon(
-                            imageVector = item.icon,
-                            contentDescription = null,
-                            tint = if (!item.isLogout) uiColors.textPrimary else Color(0xFFB32727)
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        uiColors.cardBackground,
+                                        Color(0xFF2F222F),
+                                        Color(0xFF2F222F),
+                                        uiColors.cardBackgroundHigh
+                                    )
+                                ),
+                                shape = RoundedCornerShape(
+                                    topStart = if (index == 0) 24.dp else 4.dp,
+                                    topEnd = if (index == 0) 24.dp else 4.dp,
+                                    bottomStart = if (index == settingsItems.size - 1) 24.dp else 4.dp,
+                                    bottomEnd = if (index == settingsItems.size - 1) 24.dp else 4.dp
+                                )
+                            ),
+                        onClick = {
+                            item.onClick()
+                        },
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.Transparent
                         )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        ) {
 
-                        Spacer(modifier = Modifier.width(14.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = item.title,
-                                color = if (!item.isLogout) uiColors.textSecondary else Color(0xFFB32727),
-                                fontFamily = FontFamily.Monospace
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = item.value,
-                                color = uiColors.textPrimary,
-                                fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                        if (item.editButton) {
                             Icon(
-                                imageVector = Icons.Default.Edit,
+                                imageVector = item.icon,
                                 contentDescription = null,
-                                tint = uiColors.textSecondary
-                            )
-                        }else if(item.toggle){
-                            Switch(
-                                checked = notificationState,
-                                onCheckedChange = {
-                                    item.onClick()
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = Color(0xFF693E01),
-                                    uncheckedThumbColor = uiColors.textSecondary,
-                                    checkedTrackColor = Color(0xFFB6774C),
-                                    uncheckedTrackColor = uiColors.cardBackground
+                                tint = if (!item.isLogout) uiColors.textPrimary else Color(
+                                    0xFFB32727
                                 )
                             )
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = item.title,
+                                    color = if (!item.isLogout) uiColors.textSecondary else Color(
+                                        0xFFB32727
+                                    ),
+                                    fontFamily = FontFamily.Monospace
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = item.value,
+                                    color = uiColors.textPrimary,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            if (item.editButton) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = null,
+                                    tint = uiColors.textSecondary
+                                )
+                            } else if (item.toggle) {
+                                Switch(
+                                    checked = notificationState,
+                                    onCheckedChange = {
+                                        item.onClick()
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = Color(0xFF693E01),
+                                        uncheckedThumbColor = uiColors.textSecondary,
+                                        checkedTrackColor = Color(0xFFB6774C),
+                                        uncheckedTrackColor = uiColors.cardBackground
+                                    )
+                                )
+                            }
                         }
                     }
                 }
-            }
-            item{
-                Spacer(
-                    modifier = Modifier.height(
-                        86.dp + WindowInsets.navigationBars.asPaddingValues()
-                            .calculateBottomPadding()
+                item {
+                    Spacer(
+                        modifier = Modifier.height(
+                            86.dp + WindowInsets.navigationBars.asPaddingValues()
+                                .calculateBottomPadding()
+                        )
                     )
-                )
+                }
             }
         }
         Column(

@@ -20,11 +20,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +52,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.savedstate.serialization.SavedStateConfiguration
+import com.kashif_e.backdrop.backdrops.layerBackdrop
+import com.kashif_e.backdrop.backdrops.rememberLayerBackdrop
+import com.kashif_e.backdrop.drawBackdrop
+import com.kashif_e.backdrop.effects.blur
 import com.kito.core.datastore.PrefsRepository
 import com.kito.core.presentation.navigation.BottomBarTabs
 import com.kito.core.presentation.navigation3.NavigationItems
@@ -78,6 +84,7 @@ fun MainUI(
     deepLinkTarget: String? = null,
     onDeepLinkConsumed: () -> Unit = {}
 ) {
+    val backdrop = rememberLayerBackdrop()
     val prefs: PrefsRepository = koinInject()
     var startDestination by remember { mutableStateOf<NavKey?>(null) }
     val rootBackStack = rememberNavBackStack(
@@ -139,141 +146,157 @@ fun MainUI(
     }
 
     val hazeState = rememberHazeState()
-
-    Scaffold(
-        containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            AnimatedVisibility(
-                visible = shouldShowBottomBar,
-                enter = slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                ),
-                exit = slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .windowInsetsPadding(WindowInsets.safeDrawing)
-                        .padding(vertical = 10.dp, horizontal = 64.dp)
-                        .fillMaxWidth()
-                        .height(64.dp)
-                        .clip(CircleShape)
-                        .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
-                            blurRadius = 15.dp
-                            noiseFactor = 0.05f
-                            inputScale = HazeInputScale.Auto
-                            alpha = 0.98f
-                        }
-                        .border(
-                            width = Dp.Hairline,
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.White.copy(alpha = 0.5f),
-                                    Color.White.copy(alpha = 0.1f),
-                                )
-                            ),
-                            shape = CircleShape
-                        )
+    Surface {
+        Scaffold(
+            containerColor = Color.Transparent,
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            bottomBar = {
+                AnimatedVisibility(
+                    visible = shouldShowBottomBar,
+                    enter = slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it },
+                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                    )
                 ) {
-                    val animatedSelectedTabIndex by animateFloatAsState(
-                        targetValue = selectedTabIndex.toFloat(),
-                        label = "animatedSelectedTabIndex",
-                        animationSpec = spring(
-                            stiffness = Spring.StiffnessLow,
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                        )
-                    )
-                    val animatedColor by animateColorAsState(
-                        targetValue = NavigationItems[selectedTabIndex].color,
-                        label = "animatedColor",
-                        animationSpec = spring(
-                            stiffness = Spring.StiffnessLow,
-                        )
-                    )
-
-                    Canvas(
-                        modifier = Modifier.fillMaxSize()
+                    Box(
+                        modifier = Modifier
+                            .windowInsetsPadding(WindowInsets.safeDrawing)
+                            .padding(vertical = 10.dp, horizontal = 64.dp)
+                            .fillMaxWidth()
+                            .height(64.dp)
+                            .clip(CircleShape)
+//                            .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
+//                                blurRadius = 15.dp
+//                                noiseFactor = 0.05f
+//                                inputScale = HazeInputScale.Auto
+//                                alpha = 0.98f
+//                            }
+                            .drawBackdrop(
+                                backdrop = backdrop,
+                                shape = { RoundedCornerShape(24.dp) },
+                                effects = {
+                                    blur(16.dp.toPx())
+                                }
+                            )
+                            .border(
+                                width = Dp.Hairline,
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.White.copy(alpha = 0.5f),
+                                        Color.White.copy(alpha = 0.1f),
+                                    )
+                                ),
+                                shape = CircleShape
+                            )
                     ) {
-                        val tabWidth = size.width / NavigationItems.size
-                        val centerOffset = tabWidth * animatedSelectedTabIndex + tabWidth / 2
-
-                        drawCircle(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    animatedColor.copy(alpha = 0.3f),
-                                    Color.Transparent
-                                ),
-                                center = Offset(centerOffset, size.height * 0.55f),
-                                radius = tabWidth * 0.7f
-                            ),
-                            radius = tabWidth * 0.7f,
-                            center = Offset(centerOffset, size.height * 0.55f)
+                        val animatedSelectedTabIndex by animateFloatAsState(
+                            targetValue = selectedTabIndex.toFloat(),
+                            label = "animatedSelectedTabIndex",
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessLow,
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                            )
+                        )
+                        val animatedColor by animateColorAsState(
+                            targetValue = NavigationItems[selectedTabIndex].color,
+                            label = "animatedColor",
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessLow,
+                            )
                         )
 
-                        val path = Path().apply {
-                            addRoundRect(RoundRect(size.toRect(), CornerRadius(size.height / 2f)))
-                        }
-                        val measure = PathMeasure()
-                        measure.setPath(path, false)
-                        drawPath(
-                            path = path,
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    animatedColor.copy(alpha = 0.5f),
-                                    animatedColor,
-                                    animatedColor.copy(alpha = 0.5f),
-                                    Color.Transparent,
+                        Canvas(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            val tabWidth = size.width / NavigationItems.size
+                            val centerOffset = tabWidth * animatedSelectedTabIndex + tabWidth / 2
+
+                            drawCircle(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        animatedColor.copy(alpha = 0.3f),
+                                        Color.Transparent
+                                    ),
+                                    center = Offset(centerOffset, size.height * 0.55f),
+                                    radius = tabWidth * 0.7f
                                 ),
-                                startX = centerOffset - (tabWidth * 0.6f),
-                                endX = centerOffset + (tabWidth * 0.6f),
-                            ),
-                            style = Stroke(width = 5f)
+                                radius = tabWidth * 0.7f,
+                                center = Offset(centerOffset, size.height * 0.55f)
+                            )
+
+                            val path = Path().apply {
+                                addRoundRect(
+                                    RoundRect(
+                                        size.toRect(),
+                                        CornerRadius(size.height / 2f)
+                                    )
+                                )
+                            }
+                            val measure = PathMeasure()
+                            measure.setPath(path, false)
+                            drawPath(
+                                path = path,
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        animatedColor.copy(alpha = 0.5f),
+                                        animatedColor,
+                                        animatedColor.copy(alpha = 0.5f),
+                                        Color.Transparent,
+                                    ),
+                                    startX = centerOffset - (tabWidth * 0.6f),
+                                    endX = centerOffset + (tabWidth * 0.6f),
+                                ),
+                                style = Stroke(width = 5f)
+                            )
+                        }
+
+                        BottomBarTabs(
+                            tabs = NavigationItems,
+                            selectedTab = selectedTabIndex,
+                            onTabSelected = { item ->
+                                tabBackStack.navigateTab(item.destination)
+                            }
                         )
                     }
-
-                    BottomBarTabs(
-                        tabs = NavigationItems,
-                        selectedTab = selectedTabIndex,
-                        onTabSelected = { item ->
-                            tabBackStack.navigateTab(item.destination)
-                        }
-                    )
                 }
             }
-        }
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
         ) {
             Box(
-                modifier = Modifier.hazeSource(hazeState)
+                modifier = Modifier.fillMaxSize()
             ) {
-                RootNavGraph(
-                    rootNavBackStack = rootBackStack,
-                    tabNavBackStack = tabBackStack,
-                    snackbarHostState = snackbarHostState
-                )
-            }
-            if (navigationBarType == NavigationBarType.ThreeButton) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .height(
-                            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                        )
-                        .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
-                            blurRadius = 15.dp
-                            noiseFactor = 0.05f
-                            inputScale = HazeInputScale.Auto
-                            alpha = 0.98f
-                        }
-                )
+                        .layerBackdrop(backdrop)
+                        .hazeSource(hazeState)
+                ) {
+                    RootNavGraph(
+                        rootNavBackStack = rootBackStack,
+                        tabNavBackStack = tabBackStack,
+                        snackbarHostState = snackbarHostState
+                    )
+                }
+                if (navigationBarType == NavigationBarType.ThreeButton) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .height(
+                                WindowInsets.navigationBars.asPaddingValues()
+                                    .calculateBottomPadding()
+                            )
+                            .hazeEffect(state = hazeState, style = HazeMaterials.ultraThin()) {
+                                blurRadius = 15.dp
+                                noiseFactor = 0.05f
+                                inputScale = HazeInputScale.Auto
+                                alpha = 0.98f
+                            }
+                    )
+                }
             }
         }
     }

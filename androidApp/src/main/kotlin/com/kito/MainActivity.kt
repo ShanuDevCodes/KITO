@@ -113,12 +113,10 @@ class MainActivity : ComponentActivity() {
             }
             splashScreen.setKeepOnScreenCondition { keepOnScreenCondition }
             KitoTheme {
-                Surface {
-                    MainUI(
-                        deepLinkTarget = deepLinkTarget,
-                        onDeepLinkConsumed = { deepLinkTarget = null }
-                    )
-                }
+                MainUI(
+                    deepLinkTarget = deepLinkTarget,
+                    onDeepLinkConsumed = { deepLinkTarget = null }
+                )
             }
         }
     }
